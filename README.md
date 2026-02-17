@@ -10,7 +10,7 @@ Matilda is a virtual trading wallet web app with play-money positions and live q
 - Recent trade activity log
 - Local persistence using browser `localStorage`
 - Live market quotes from Alpaca via secure backend route (`/api/quotes`)
-- Clickable symbols with a basic candlestick chart (`1Min` candles)
+- Clickable symbols with a basic candlestick chart (toggle `Hours` / `Days` / `Months`)
 - Mock AI research panel with sentiment score and buy/sell sizing recommendation
 - Automatic simulation fallback if live API is unavailable
 

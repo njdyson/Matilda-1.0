@@ -318,14 +318,14 @@ function parseSingleSymbol(raw) {
 
 function parseTimeframe(raw) {
   const value = String(raw || "1Min").trim();
-  const allowed = new Set(["1Min", "5Min", "15Min", "1Hour", "1Day"]);
+  const allowed = new Set(["1Min", "5Min", "15Min", "1Hour", "1Day", "1Month"]);
   return allowed.has(value) ? value : "1Min";
 }
 
 function parseLimit(raw) {
   const value = Number(raw);
   if (!Number.isFinite(value)) return 50;
-  return Math.max(10, Math.min(200, Math.floor(value)));
+  return Math.max(10, Math.min(500, Math.floor(value)));
 }
 
 function asNumber(value) {

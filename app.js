@@ -4,8 +4,33 @@ const PRICE_TICK_MS = 5000;
 const CANDLE_REFRESH_MS = 30000;
 const API_QUOTES_URL = "/api/quotes";
 const API_CANDLES_URL = "/api/candles";
-const CHART_TIMEFRAME = "1Min";
-const CHART_LIMIT = 50;
+const DEFAULT_CHART_SCALE = "days";
+const CHART_MODES = {
+  hours: {
+    label: "Hours",
+    timeframe: "1Hour",
+    fetchLimit: 96,
+    displayLimit: 96,
+    stepMs: 60 * 60 * 1000,
+    aggregate: "none",
+  },
+  days: {
+    label: "Days",
+    timeframe: "1Day",
+    fetchLimit: 90,
+    displayLimit: 90,
+    stepMs: 24 * 60 * 60 * 1000,
+    aggregate: "none",
+  },
+  months: {
+    label: "Months",
+    timeframe: "1Day",
+    fetchLimit: 365,
+    displayLimit: 24,
+    stepMs: 30 * 24 * 60 * 60 * 1000,
+    aggregate: "month",
+  },
+};
 
 const STOCKS = [
   { symbol: "AAPL", basePrice: 192.35 },
@@ -128,6 +153,7 @@ const els = {
   chartTitle: document.getElementById("chartTitle"),
   chartStatus: document.getElementById("chartStatus"),
   candleSvg: document.getElementById("candleSvg"),
+  timeframeButtons: Array.from(document.querySelectorAll(".timeframe-btn")),
   aiTitle: document.getElementById("aiTitle"),
   aiStatus: document.getElementById("aiStatus"),
   aiSentimentBadge: document.getElementById("aiSentimentBadge"),
@@ -137,7 +163,6 @@ const els = {
   aiRecommendationText: document.getElementById("aiRecommendationText"),
   applyAiRecommendationBtn: document.getElementById("applyAiRecommendationBtn"),
   aiResearchArea: document.getElementById("aiResearchArea"),
-  aiNotesArea: document.getElementById("aiNotesArea"),
 };
 
 let state = hydrateState();
@@ -148,7 +173,6 @@ let lastCandleRefreshAt = 0;
 let marketSourceLabel = "Source: Loading...";
 let candleSourceLabel = "Select a symbol to load chart data";
 let currentAiRecommendation = null;
-let notesEditingSymbol = null;
 
 initializeApp();
 
@@ -157,6 +181,9 @@ async function initializeApp() {
   bindEvents();
   if (!state.selectedSymbol || !state.prices[state.selectedSymbol]) {
     state.selectedSymbol = STOCKS[0].symbol;
+  }
+  if (!CHART_MODES[state.chartScale]) {
+    state.chartScale = DEFAULT_CHART_SCALE;
   }
   els.symbolSelect.value = state.selectedSymbol;
   renderAll();
@@ -179,7 +206,9 @@ function bindEvents() {
   els.symbolSelect.addEventListener("change", onSymbolChangeFromTradeForm);
   els.marketBody.addEventListener("click", onMarketSymbolClick);
   els.applyAiRecommendationBtn.addEventListener("click", applyAiRecommendationToTicket);
-  els.aiNotesArea.addEventListener("input", onAiNotesInput);
+  for (const btn of els.timeframeButtons) {
+    btn.addEventListener("click", onChartScaleButtonClick);
+  }
 }
 
 function onSymbolChangeFromTradeForm() {
@@ -187,7 +216,6 @@ function onSymbolChangeFromTradeForm() {
   if (!symbol || !state.prices[symbol]) return;
 
   state.selectedSymbol = symbol;
-  notesEditingSymbol = null;
   persistState();
   renderAll();
   void refreshCandlesForSelectedSymbol(true);
@@ -205,23 +233,23 @@ function onMarketSymbolClick(event) {
 
   state.selectedSymbol = symbol;
   els.symbolSelect.value = symbol;
-  notesEditingSymbol = null;
   persistState();
   renderAll();
   void refreshCandlesForSelectedSymbol(true);
 }
 
-function onAiNotesInput() {
-  const symbol = state.selectedSymbol;
-  if (!symbol) return;
+function onChartScaleButtonClick(event) {
+  const target = event.currentTarget;
+  if (!(target instanceof HTMLElement)) return;
 
-  if (!state.aiNotes || typeof state.aiNotes !== "object") {
-    state.aiNotes = {};
-  }
+  const nextScale = String(target.dataset.chartScale || "").toLowerCase();
+  if (!CHART_MODES[nextScale]) return;
+  if (nextScale === state.chartScale) return;
 
-  state.aiNotes[symbol] = String(els.aiNotesArea.value || "").slice(0, 2000);
-  notesEditingSymbol = symbol;
+  state.chartScale = nextScale;
   persistState();
+  renderAll();
+  void refreshCandlesForSelectedSymbol(true);
 }
 
 function onTradeSubmit(event) {
@@ -409,23 +437,28 @@ function updatePricesWithSimulation() {
 
 async function refreshCandlesForSelectedSymbol(force = false) {
   const symbol = state.selectedSymbol;
+  const mode = getChartMode();
   if (!symbol) return;
   if (isRefreshingCandles) return;
   if (!force && Date.now() - lastCandleRefreshAt < CANDLE_REFRESH_MS) return;
 
   isRefreshingCandles = true;
-  candleSourceLabel = `Loading ${symbol} candles...`;
+  candleSourceLabel = `Loading ${symbol} ${mode.label.toLowerCase()} candles...`;
   renderCandleChart();
 
   try {
-    const candles = await fetchLiveCandles(symbol);
+    const rawCandles = await fetchLiveCandles(symbol, mode.timeframe, mode.fetchLimit);
+    const candles = transformCandlesForMode(rawCandles, mode);
     if (symbol !== state.selectedSymbol) return;
     chartCandles = candles;
-    candleSourceLabel = `Source: Alpaca ${CHART_TIMEFRAME} candles`;
+    candleSourceLabel =
+      mode.aggregate === "month"
+        ? "Source: Alpaca monthly candles (aggregated from daily bars)"
+        : `Source: Alpaca ${mode.label.toLowerCase()} candles`;
   } catch (error) {
     if (symbol !== state.selectedSymbol) return;
-    chartCandles = buildFallbackCandles(symbol);
-    candleSourceLabel = "Source: Simulated candles (Alpaca unavailable)";
+    chartCandles = buildFallbackCandles(symbol, mode);
+    candleSourceLabel = `Source: Simulated ${mode.label.toLowerCase()} candles`;
     console.warn("Live candles failed; using simulation fallback.", error);
   } finally {
     if (symbol === state.selectedSymbol) {
@@ -436,11 +469,11 @@ async function refreshCandlesForSelectedSymbol(force = false) {
   }
 }
 
-async function fetchLiveCandles(symbol) {
+async function fetchLiveCandles(symbol, timeframe, limit) {
   const endpoint =
     `${API_CANDLES_URL}?symbol=${encodeURIComponent(symbol)}` +
-    `&timeframe=${encodeURIComponent(CHART_TIMEFRAME)}` +
-    `&limit=${encodeURIComponent(CHART_LIMIT)}`;
+    `&timeframe=${encodeURIComponent(timeframe)}` +
+    `&limit=${encodeURIComponent(limit)}`;
 
   const response = await fetch(endpoint, {
     headers: {
@@ -484,16 +517,18 @@ async function fetchLiveCandles(symbol) {
     throw new Error("Candles endpoint returned invalid candle rows.");
   }
 
-  return normalized.slice(-CHART_LIMIT);
+  return normalized.slice(-limit);
 }
 
-function buildFallbackCandles(symbol) {
+function buildFallbackCandles(symbol, mode) {
   const now = Date.now();
   const currentPrice = state.prices[symbol]?.price || 100;
   const candles = [];
   let previousClose = currentPrice;
+  const limit = mode?.displayLimit || CHART_MODES[DEFAULT_CHART_SCALE].displayLimit;
+  const stepMs = mode?.stepMs || CHART_MODES[DEFAULT_CHART_SCALE].stepMs;
 
-  for (let i = CHART_LIMIT - 1; i >= 0; i -= 1) {
+  for (let i = limit - 1; i >= 0; i -= 1) {
     const drift = (Math.random() * 0.014 - 0.007) * previousClose;
     const open = previousClose;
     const close = Math.max(1, open + drift);
@@ -501,7 +536,7 @@ function buildFallbackCandles(symbol) {
     const low = Math.min(open, close) - Math.random() * previousClose * 0.003;
 
     candles.push({
-      t: new Date(now - i * 60000).toISOString(),
+      t: new Date(now - i * stepMs).toISOString(),
       o: round2(open),
       h: round2(Math.max(high, open, close)),
       l: round2(Math.max(0.01, Math.min(low, open, close))),
@@ -527,7 +562,6 @@ function resetWallet() {
   }
   els.symbolSelect.value = state.selectedSymbol;
   chartCandles = [];
-  notesEditingSymbol = null;
   setTradeMessage("Wallet reset to starting balance.", "up");
   persistAndRender();
   void refreshCandlesForSelectedSymbol(true);
@@ -564,8 +598,18 @@ function renderSummary() {
 }
 
 function renderMarket() {
-  els.marketBody.innerHTML = STOCKS.map((stock) => {
+  const sortedStocks = [...STOCKS].sort((a, b) => {
+    const aConfidence = clamp(Math.round(getAiProfile(a.symbol).confidence), 0, 100);
+    const bConfidence = clamp(Math.round(getAiProfile(b.symbol).confidence), 0, 100);
+    if (bConfidence !== aConfidence) return bConfidence - aConfidence;
+    return a.symbol.localeCompare(b.symbol);
+  });
+
+  els.marketBody.innerHTML = sortedStocks.map((stock) => {
     const quote = state.prices[stock.symbol];
+    const profile = getAiProfile(stock.symbol);
+    const confidence = clamp(Math.round(profile.confidence), 0, 100);
+    const confidenceTone = confidence >= 75 ? "high" : confidence >= 55 ? "mid" : "low";
     const dayChange = round2(quote.price - quote.lastClose);
     const dayPct = quote.lastClose > 0 ? round2((dayChange / quote.lastClose) * 100) : 0;
     const cls = dayChange >= 0 ? "up" : "down";
@@ -578,6 +622,9 @@ function renderMarket() {
           </button>
         </td>
         <td>${fmtMoney(quote.price)}</td>
+        <td>
+          <span class="confidence-chip ${confidenceTone}">${confidence}%</span>
+        </td>
         <td class="${cls}">
           ${signedMoney(dayChange)} (${signedPct(dayPct)})
         </td>
@@ -597,7 +644,7 @@ function renderAiPanel() {
 
   currentAiRecommendation = recommendation;
   els.aiTitle.textContent = `AI Research: ${symbol}`;
-  els.aiStatus.textContent = "Mock research model (placeholder until API integration)";
+  els.aiStatus.textContent = "Mock battle analyst model (placeholder until API integration)";
   els.aiSentimentBadge.textContent = `${sentiment > 0 ? "+" : ""}${sentiment} / 100`;
   els.aiSentimentBadge.classList.remove("up", "down");
   if (sentiment > 0) els.aiSentimentBadge.classList.add("up");
@@ -614,11 +661,6 @@ function renderAiPanel() {
     : "No Action To Apply";
 
   els.aiResearchArea.value = buildAiResearchText(symbol, quote, profile);
-
-  if (document.activeElement !== els.aiNotesArea || notesEditingSymbol !== symbol) {
-    const noteText = state.aiNotes?.[symbol] || "";
-    els.aiNotesArea.value = noteText;
-  }
 }
 
 function getAiProfile(symbol) {
@@ -739,10 +781,64 @@ function applyAiRecommendationToTicket() {
 }
 
 function renderCandleChart() {
+  const mode = getChartMode();
   const symbol = state.selectedSymbol || "--";
-  els.chartTitle.textContent = `Candles: ${symbol} (${CHART_TIMEFRAME})`;
+  els.chartTitle.textContent = `Candles: ${symbol} (${mode.label})`;
   els.chartStatus.textContent = candleSourceLabel;
+  syncChartScaleButtons();
   drawCandlesSvg(chartCandles);
+}
+
+function getChartMode() {
+  return CHART_MODES[state.chartScale] || CHART_MODES[DEFAULT_CHART_SCALE];
+}
+
+function syncChartScaleButtons() {
+  for (const btn of els.timeframeButtons) {
+    const scale = String(btn.dataset.chartScale || "").toLowerCase();
+    btn.classList.toggle("is-active", scale === state.chartScale);
+  }
+}
+
+function transformCandlesForMode(candles, mode) {
+  if (!Array.isArray(candles)) return [];
+
+  if (mode.aggregate === "month") {
+    return aggregateCandlesByMonth(candles).slice(-mode.displayLimit);
+  }
+
+  return candles.slice(-mode.displayLimit);
+}
+
+function aggregateCandlesByMonth(candles) {
+  const out = [];
+  let currentKey = "";
+  let acc = null;
+
+  for (const candle of candles) {
+    const date = new Date(candle.t);
+    const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+
+    if (key !== currentKey) {
+      if (acc) out.push(acc);
+      currentKey = key;
+      acc = {
+        t: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString(),
+        o: candle.o,
+        h: candle.h,
+        l: candle.l,
+        c: candle.c,
+      };
+      continue;
+    }
+
+    acc.h = Math.max(acc.h, candle.h);
+    acc.l = Math.min(acc.l, candle.l);
+    acc.c = candle.c;
+  }
+
+  if (acc) out.push(acc);
+  return out;
 }
 
 function drawCandlesSvg(candles) {
@@ -980,16 +1076,6 @@ function normalizeState(input) {
     }
   }
 
-  const aiNotes = {};
-  if (safe.aiNotes && typeof safe.aiNotes === "object") {
-    for (const stock of STOCKS) {
-      const rawNote = safe.aiNotes[stock.symbol];
-      if (typeof rawNote === "string" && rawNote.length > 0) {
-        aiNotes[stock.symbol] = rawNote.slice(0, 2000);
-      }
-    }
-  }
-
   return {
     cash:
       typeof safe.cash === "number" && Number.isFinite(safe.cash) && safe.cash >= 0
@@ -1003,7 +1089,10 @@ function normalizeState(input) {
       typeof safe.selectedSymbol === "string" && prices[safe.selectedSymbol]
         ? safe.selectedSymbol
         : fresh.selectedSymbol,
-    aiNotes,
+    chartScale:
+      typeof safe.chartScale === "string" && CHART_MODES[safe.chartScale]
+        ? safe.chartScale
+        : fresh.chartScale,
     prices,
     positions,
     transactions: Array.isArray(safe.transactions) ? safe.transactions.slice(0, 100) : [],
@@ -1023,7 +1112,7 @@ function createInitialState() {
     cash: STARTING_CASH,
     realizedPnl: 0,
     selectedSymbol: STOCKS[0].symbol,
-    aiNotes: {},
+    chartScale: DEFAULT_CHART_SCALE,
     prices,
     positions: {},
     transactions: [],

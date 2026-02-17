@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Matilda | Virtual Trading Wallet</title>
+    <title>Matilda | Trading Console</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -18,9 +18,7 @@
     <main class="app-shell">
       <header class="app-header">
         <div>
-          <p class="kicker">Virtual Trading</p>
           <h1>Matilda</h1>
-          <p class="subtitle">Play money wallet for stock strategy testing.</p>
         </div>
         <div class="header-actions">
           <button id="resetWalletBtn" class="btn btn-ghost">Reset Wallet</button>
@@ -51,64 +49,6 @@
       </section>
 
       <section class="content-grid">
-        <article class="panel chart-panel">
-          <div class="panel-head">
-            <h2 id="chartTitle">Candles: --</h2>
-            <p id="chartStatus">Select a symbol to load chart data</p>
-          </div>
-          <div class="chart-wrap">
-            <svg
-              id="candleSvg"
-              viewBox="0 0 960 320"
-              preserveAspectRatio="none"
-              role="img"
-              aria-label="Candlestick chart"
-            ></svg>
-          </div>
-        </article>
-
-        <article class="panel ai-panel">
-          <div class="panel-head">
-            <h2 id="aiTitle">AI Research: --</h2>
-            <p id="aiStatus">Mock research model (placeholder)</p>
-          </div>
-          <div class="ai-grid">
-            <section class="ai-metrics">
-              <div class="metric-block">
-                <p class="metric-label">Sentiment Score</p>
-                <p id="aiSentimentBadge" class="metric-badge">0 / 100</p>
-                <div class="meter">
-                  <div id="aiSentimentFill" class="meter-fill"></div>
-                </div>
-              </div>
-              <div class="metric-block">
-                <p class="metric-label">Confidence</p>
-                <p id="aiConfidenceValue" class="metric-value">0%</p>
-                <div class="meter">
-                  <div id="aiConfidenceFill" class="meter-fill confidence"></div>
-                </div>
-              </div>
-              <div class="metric-block">
-                <p class="metric-label">Position Recommendation</p>
-                <p id="aiRecommendationText" class="metric-recommendation">Select a symbol.</p>
-                <button id="applyAiRecommendationBtn" type="button" class="btn btn-primary">
-                  Apply Recommendation
-                </button>
-              </div>
-            </section>
-            <section class="ai-texts">
-              <label class="ai-label">
-                AI Research Brief (mock)
-                <textarea id="aiResearchArea" rows="8" readonly></textarea>
-              </label>
-              <label class="ai-label">
-                Strategy Notes (saved per stock)
-                <textarea id="aiNotesArea" rows="4" placeholder="Your notes for this symbol..."></textarea>
-              </label>
-            </section>
-          </div>
-        </article>
-
         <article class="panel">
           <div class="panel-head">
             <h2>Market Snapshot</h2>
@@ -120,6 +60,7 @@
                 <tr>
                   <th>Symbol</th>
                   <th>Price</th>
+                  <th>Confidence</th>
                   <th>Day</th>
                 </tr>
               </thead>
@@ -152,6 +93,67 @@
             <button type="submit" class="btn btn-primary">Execute Trade</button>
           </form>
           <p id="tradeMessage" class="trade-message" aria-live="polite"></p>
+        </article>
+
+        <article class="panel ai-panel">
+          <div class="panel-head">
+            <h2 id="aiTitle">AI Research: --</h2>
+            <p id="aiStatus">Mock battle analyst model (placeholder)</p>
+          </div>
+          <div class="ai-grid">
+            <section class="ai-metrics">
+              <div class="metric-block">
+                <p class="metric-label">Sentiment Score</p>
+                <p id="aiSentimentBadge" class="metric-badge">0 / 100</p>
+                <div class="meter">
+                  <div id="aiSentimentFill" class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="metric-block">
+                <p class="metric-label">Confidence</p>
+                <p id="aiConfidenceValue" class="metric-value">0%</p>
+                <div class="meter">
+                  <div id="aiConfidenceFill" class="meter-fill confidence"></div>
+                </div>
+              </div>
+              <div class="metric-block">
+                <p class="metric-label">Position Recommendation</p>
+                <p id="aiRecommendationText" class="metric-recommendation">Select a symbol.</p>
+                <button id="applyAiRecommendationBtn" type="button" class="btn btn-primary">
+                  Apply Recommendation
+                </button>
+              </div>
+            </section>
+            <section class="ai-texts">
+              <label class="ai-label">
+                AI Research Brief (mock)
+                <textarea id="aiResearchArea" rows="8" readonly></textarea>
+              </label>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h2 id="chartTitle">Candles: --</h2>
+              <p id="chartStatus">Select a symbol to load chart data</p>
+            </div>
+            <div class="timeframe-switch" role="group" aria-label="Chart timeframe">
+              <button type="button" class="timeframe-btn" data-chart-scale="hours">Hours</button>
+              <button type="button" class="timeframe-btn is-active" data-chart-scale="days">Days</button>
+              <button type="button" class="timeframe-btn" data-chart-scale="months">Months</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <svg
+              id="candleSvg"
+              viewBox="0 0 960 320"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Candlestick chart"
+            ></svg>
+          </div>
         </article>
 
         <article class="panel">
