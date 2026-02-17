@@ -1,0 +1,12 @@
+{
+  "name": "matilda-wallet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Matilda virtual trading wallet with Alpaca market data integration.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js && node --check app.js"
+  }
+}

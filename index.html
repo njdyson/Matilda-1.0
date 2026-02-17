@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matilda | Virtual Trading Wallet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="kicker">Virtual Trading</p>
+          <h1>Matilda</h1>
+          <p class="subtitle">Play money wallet for stock strategy testing.</p>
+        </div>
+        <div class="header-actions">
+          <button id="resetWalletBtn" class="btn btn-ghost">Reset Wallet</button>
+        </div>
+      </header>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <h2>Cash</h2>
+          <p id="cashValue">$0.00</p>
+        </article>
+        <article class="summary-card">
+          <h2>Portfolio Value</h2>
+          <p id="portfolioValue">$0.00</p>
+        </article>
+        <article class="summary-card">
+          <h2>Total Equity</h2>
+          <p id="equityValue">$0.00</p>
+        </article>
+        <article class="summary-card">
+          <h2>Unrealized P/L</h2>
+          <p id="unrealizedValue">$0.00</p>
+        </article>
+        <article class="summary-card">
+          <h2>Realized P/L</h2>
+          <p id="realizedValue">$0.00</p>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <h2 id="chartTitle">Candles: --</h2>
+            <p id="chartStatus">Select a symbol to load chart data</p>
+          </div>
+          <div class="chart-wrap">
+            <svg
+              id="candleSvg"
+              viewBox="0 0 960 320"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Candlestick chart"
+            ></svg>
+          </div>
+        </article>
+
+        <article class="panel ai-panel">
+          <div class="panel-head">
+            <h2 id="aiTitle">AI Research: --</h2>
+            <p id="aiStatus">Mock research model (placeholder)</p>
+          </div>
+          <div class="ai-grid">
+            <section class="ai-metrics">
+              <div class="metric-block">
+                <p class="metric-label">Sentiment Score</p>
+                <p id="aiSentimentBadge" class="metric-badge">0 / 100</p>
+                <div class="meter">
+                  <div id="aiSentimentFill" class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="metric-block">
+                <p class="metric-label">Confidence</p>
+                <p id="aiConfidenceValue" class="metric-value">0%</p>
+                <div class="meter">
+                  <div id="aiConfidenceFill" class="meter-fill confidence"></div>
+                </div>
+              </div>
+              <div class="metric-block">
+                <p class="metric-label">Position Recommendation</p>
+                <p id="aiRecommendationText" class="metric-recommendation">Select a symbol.</p>
+                <button id="applyAiRecommendationBtn" type="button" class="btn btn-primary">
+                  Apply Recommendation
+                </button>
+              </div>
+            </section>
+            <section class="ai-texts">
+              <label class="ai-label">
+                AI Research Brief (mock)
+                <textarea id="aiResearchArea" rows="8" readonly></textarea>
+              </label>
+              <label class="ai-label">
+                Strategy Notes (saved per stock)
+                <textarea id="aiNotesArea" rows="4" placeholder="Your notes for this symbol..."></textarea>
+              </label>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Market Snapshot</h2>
+            <p id="marketSourceStatus">Source: Starting...</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Price</th>
+                  <th>Day</th>
+                </tr>
+              </thead>
+              <tbody id="marketBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Trade Ticket</h2>
+            <p>Buy and sell with virtual money</p>
+          </div>
+          <form id="tradeForm" class="trade-form">
+            <label>
+              Symbol
+              <select id="symbolSelect"></select>
+            </label>
+            <label>
+              Side
+              <select id="sideSelect">
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+              </select>
+            </label>
+            <label>
+              Shares
+              <input id="sharesInput" type="number" min="1" step="1" value="1" required />
+            </label>
+            <button type="submit" class="btn btn-primary">Execute Trade</button>
+          </form>
+          <p id="tradeMessage" class="trade-message" aria-live="polite"></p>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Positions</h2>
+            <p>Your current virtual holdings</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Shares</th>
+                  <th>Avg Cost</th>
+                  <th>Market Value</th>
+                  <th>Unrealized</th>
+                </tr>
+              </thead>
+              <tbody id="positionsBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Recent Activity</h2>
+            <p>Latest 12 virtual trades</p>
+          </div>
+          <ul id="activityList" class="activity-list"></ul>
+        </article>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
