@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Matilda | Trading Console</title>
+    <link rel="icon" type="image/png" href="robot.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,10 +19,19 @@
     <main class="app-shell">
       <header class="app-header">
         <div>
-          <h1>Matilda</h1>
+          <h1>Matilda 1.0</h1>
         </div>
         <div class="header-actions">
-          <button id="resetWalletBtn" class="btn btn-ghost">Reset Wallet</button>
+          <label class="global-horizon-control">
+            Horizon
+            <select id="aiHorizonSelect">
+              <option value="short">Short</option>
+              <option value="swing">Swing</option>
+              <option value="long">Long</option>
+            </select>
+          </label>
+          <button id="openTradeTicketBtn" type="button" class="btn btn-ghost">Trade Ticket</button>
+          <button id="openSettingsBtn" type="button" class="btn btn-ghost">Settings</button>
         </div>
       </header>
 
@@ -49,68 +59,202 @@
       </section>
 
       <section class="content-grid">
-        <article class="panel">
+        <article class="panel market-panel">
           <div class="panel-head">
-            <h2>Market Snapshot</h2>
+            <h2>Watchlist</h2>
             <p id="marketSourceStatus">Source: Starting...</p>
           </div>
+          <div class="symbol-search-panel">
+            <label class="symbol-search-label" for="symbolSearchInput">Search & Add Symbol</label>
+            <div class="symbol-search-row">
+              <input
+                id="symbolSearchInput"
+                type="text"
+                inputmode="text"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="Try ADBE or Microsoft"
+              />
+              <button id="addSymbolBtn" type="button" class="btn btn-ghost">Add</button>
+            </div>
+            <div id="symbolSearchResults" class="symbol-search-results"></div>
+            <p id="symbolSearchMessage" class="trade-message" aria-live="polite"></p>
+          </div>
           <div class="table-wrap">
-            <table>
+            <table class="market-table">
               <thead>
                 <tr>
                   <th>Symbol</th>
                   <th>Price</th>
+                  <th>Position</th>
                   <th>Confidence</th>
                   <th>Day</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="marketBody"></tbody>
             </table>
           </div>
+          <div class="table-pagination">
+            <button id="marketPrevPageBtn" type="button" class="btn btn-ghost">Prev</button>
+            <p id="marketPageLabel">Page 1 of 1</p>
+            <button id="marketNextPageBtn" type="button" class="btn btn-ghost">Next</button>
+          </div>
         </article>
 
-        <article class="panel">
+        <article class="panel autobot-panel">
           <div class="panel-head">
-            <h2>Trade Ticket</h2>
-            <p>Buy and sell with virtual money</p>
+            <h2>Auto Trade</h2>
+            <p id="autobotStatus">Disabled</p>
           </div>
-          <form id="tradeForm" class="trade-form">
-            <label>
-              Symbol
-              <select id="symbolSelect"></select>
+          <div class="autobot-controls">
+            <label class="autobot-switch">
+              <input id="autobotEnabledToggle" type="checkbox" />
+              <span class="autobot-switch-track" aria-hidden="true"></span>
+              <span class="autobot-switch-label">Enabled</span>
             </label>
-            <label>
-              Side
-              <select id="sideSelect">
-                <option value="buy">Buy</option>
-                <option value="sell">Sell</option>
-              </select>
-            </label>
-            <label>
-              Shares
-              <input id="sharesInput" type="number" min="1" step="1" value="1" required />
-            </label>
-            <button type="submit" class="btn btn-primary">Execute Trade</button>
-          </form>
-          <p id="tradeMessage" class="trade-message" aria-live="polite"></p>
+            <button id="autobotRunNowBtn" type="button" class="btn btn-ghost">Think Now</button>
+          </div>
+          <p id="backendRuntimeStatus" class="backend-runtime-status">Backend Runtime: connecting...</p>
+          <label class="autobot-label">
+            Thinking Feed (latest)
+            <textarea id="autobotThoughtArea" rows="5" readonly></textarea>
+          </label>
+          <p id="autobotRecommendationLine" class="autobot-recommendation">Latest Auto Action: --</p>
+          <p id="autobotMessage" class="trade-message" aria-live="polite"></p>
+        </article>
+
+        <article class="panel scout-ticker-panel" aria-live="polite">
+          <div class="watchlist-research-ticker">
+            <div class="watchlist-research-ticker-head">
+              <p class="watchlist-research-ticker-label">Discovery Ticker</p>
+              <label class="autobot-switch discovery-switch">
+                <input id="discoveryEnabledToggle" type="checkbox" checked />
+                <span class="autobot-switch-track" aria-hidden="true"></span>
+                <span class="autobot-switch-label">Enabled</span>
+              </label>
+            </div>
+            <p id="watchlistResearchTickerLine" class="watchlist-research-ticker-line">
+              Research ticker idle.
+            </p>
+          </div>
         </article>
 
         <article class="panel ai-panel">
           <div class="panel-head">
-            <h2 id="aiTitle">AI Research: --</h2>
-            <p id="aiStatus">Mock battle analyst model (placeholder)</p>
+            <h2 id="aiTitle">Watchlist Research: --</h2>
+            <p id="aiStatus">AI model idle</p>
           </div>
+          <details class="ai-settings-accordion">
+            <summary>AI Settings</summary>
+            <section class="settings-box ai-settings-box" aria-label="AI settings">
+              <label>
+                Provider
+                <select id="aiProviderSelect">
+                  <option value="openai">OpenAI</option>
+                </select>
+              </label>
+              <label>
+                Model
+                <select id="aiModelSelect">
+                  <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+                  <option value="gpt-4o-mini">gpt-4o-mini</option>
+                  <option value="gpt-5-mini">gpt-5-mini</option>
+                  <option value="gpt-5-mini-2025-08-07">gpt-5-mini-2025-08-07</option>
+                </select>
+              </label>
+              <label class="checkbox-setting">
+                Auto Research Refresh
+                <input id="aiResearchAutoRefreshEnabledInput" type="checkbox" checked />
+              </label>
+              <label class="ai-refresh-mins">
+                Research Refresh (mins)
+                <input
+                  id="aiResearchAutoRefreshMinsInput"
+                  type="number"
+                  min="15"
+                  max="720"
+                  step="5"
+                  value="60"
+                />
+              </label>
+            </section>
+            <section class="ai-thresholds" aria-label="AI signal thresholds">
+              <label class="threshold-control" for="addConfidenceMinInput">
+                <span class="threshold-title">Add Confidence Min</span>
+                <span id="addConfidenceMinValue" class="threshold-value">80%</span>
+                <input
+                  id="addConfidenceMinInput"
+                  type="range"
+                  min="50"
+                  max="95"
+                  step="1"
+                  value="80"
+                />
+              </label>
+              <label class="threshold-control" for="addSentimentMinInput">
+                <span class="threshold-title">Add Sentiment Min</span>
+                <span id="addSentimentMinValue" class="threshold-value">45</span>
+                <input
+                  id="addSentimentMinInput"
+                  type="range"
+                  min="0"
+                  max="90"
+                  step="1"
+                  value="45"
+                />
+              </label>
+              <label class="threshold-control" for="sellConfidenceMinInput">
+                <span class="threshold-title">Sell Confidence Min</span>
+                <span id="sellConfidenceMinValue" class="threshold-value">60%</span>
+                <input
+                  id="sellConfidenceMinInput"
+                  type="range"
+                  min="50"
+                  max="95"
+                  step="1"
+                  value="60"
+                />
+              </label>
+              <label class="threshold-control" for="sellSentimentMaxInput">
+                <span class="threshold-title">Sell Sentiment Max</span>
+                <span id="sellSentimentMaxValue" class="threshold-value">-5</span>
+                <input
+                  id="sellSentimentMaxInput"
+                  type="range"
+                  min="-60"
+                  max="20"
+                  step="1"
+                  value="-5"
+                />
+              </label>
+            </section>
+          </details>
           <div class="ai-grid">
             <section class="ai-metrics">
               <div class="metric-block">
-                <p class="metric-label">Sentiment Score</p>
+                <p class="metric-label">
+                  Sentiment Score
+                  <span
+                    class="metric-hint"
+                    title="Directional tone from -100 to +100. Negative suggests bearish tone, positive suggests bullish tone."
+                    >?</span
+                  >
+                </p>
                 <p id="aiSentimentBadge" class="metric-badge">0 / 100</p>
                 <div class="meter">
                   <div id="aiSentimentFill" class="meter-fill"></div>
                 </div>
               </div>
               <div class="metric-block">
-                <p class="metric-label">Confidence</p>
+                <p class="metric-label">
+                  Confidence
+                  <span
+                    class="metric-hint"
+                    title="How certain the model is in its BUY/HOLD/SELL position call (0-100). Higher confidence means stronger conviction, not guaranteed accuracy."
+                    >?</span
+                  >
+                </p>
                 <p id="aiConfidenceValue" class="metric-value">0%</p>
                 <div class="meter">
                   <div id="aiConfidenceFill" class="meter-fill confidence"></div>
@@ -125,9 +269,19 @@
               </div>
             </section>
             <section class="ai-texts">
+              <section class="ai-company-card">
+                <h3>Company Profile (Finnhub)</h3>
+                <p id="aiCompanyInfo" class="ai-company-info">Company: --</p>
+              </section>
               <label class="ai-label">
-                AI Research Brief (mock)
+                <span class="ai-label-row">
+                  <span>Watchlist Research Brief</span>
+                  <button id="updateAiResearchBtn" type="button" class="btn btn-ghost">
+                    Update
+                  </button>
+                </span>
                 <textarea id="aiResearchArea" rows="8" readonly></textarea>
+                <p id="aiResearchSources" class="ai-research-sources">Sources: --</p>
               </label>
             </section>
           </div>
@@ -140,9 +294,8 @@
               <p id="chartStatus">Select a symbol to load chart data</p>
             </div>
             <div class="timeframe-switch" role="group" aria-label="Chart timeframe">
-              <button type="button" class="timeframe-btn" data-chart-scale="hours">Hours</button>
-              <button type="button" class="timeframe-btn is-active" data-chart-scale="days">Days</button>
-              <button type="button" class="timeframe-btn" data-chart-scale="months">Months</button>
+              <button type="button" class="timeframe-btn is-active" data-chart-scale="mins">Mins</button>
+              <button type="button" class="timeframe-btn" data-chart-scale="days">Days</button>
             </div>
           </div>
           <div class="chart-wrap">
@@ -170,6 +323,7 @@
                   <th>Avg Cost</th>
                   <th>Market Value</th>
                   <th>Unrealized</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="positionsBody"></tbody>
@@ -185,6 +339,75 @@
           <ul id="activityList" class="activity-list"></ul>
         </article>
       </section>
+
+      <div id="tradeTicketModal" class="modal-overlay" aria-hidden="true">
+        <section class="panel modal-card">
+          <div class="panel-head">
+            <h2>Trade Ticket</h2>
+            <div class="modal-head-actions">
+              <p>Buy and sell with virtual money</p>
+              <button id="closeTradeTicketBtn" type="button" class="btn btn-ghost">Close</button>
+            </div>
+          </div>
+          <form id="tradeForm" class="trade-form">
+            <label>
+              Symbol
+              <select id="symbolSelect"></select>
+            </label>
+            <div id="tradeQuoteBox" class="trade-quote-box" aria-live="polite">
+              <p class="trade-quote-label">
+                Live Quote:
+                <span id="tradeQuoteSymbol">--</span>
+              </p>
+              <p id="tradeQuoteValue" class="trade-quote-value">--</p>
+              <p id="tradeQuoteChange" class="trade-quote-change">Day: --</p>
+              <p id="tradeQuoteNotional" class="trade-quote-notional">Order value: --</p>
+            </div>
+            <label>
+              Side
+              <select id="sideSelect">
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+              </select>
+            </label>
+            <label>
+              Shares
+              <input id="sharesInput" type="number" min="1" step="1" value="1" required />
+            </label>
+            <button type="submit" class="btn btn-primary">Execute Trade</button>
+          </form>
+          <p id="tradeMessage" class="trade-message" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div id="settingsModal" class="modal-overlay" aria-hidden="true">
+        <section class="panel modal-card">
+          <div class="panel-head">
+            <h2>Settings</h2>
+            <div class="modal-head-actions">
+              <p>Global runtime controls</p>
+              <button id="closeSettingsBtn" type="button" class="btn btn-ghost">Close</button>
+            </div>
+          </div>
+          <section class="settings-modal-form">
+            <label>
+              Auto Trade Cadence (mins)
+              <input id="autobotIntervalMinsInput" type="number" min="5" max="240" step="1" value="30" />
+            </label>
+            <label>
+              Max Trades Per Cycle
+              <input id="autobotMaxTradesPerCycleInput" type="number" min="1" max="5" step="1" value="3" />
+            </label>
+            <label>
+              Discovery Ticker Speed (mins)
+              <input id="discoveryIntervalMinsInput" type="number" min="1" max="120" step="1" value="2" />
+            </label>
+          </section>
+          <div class="settings-modal-actions">
+            <button id="resetWalletBtn" type="button" class="btn btn-ghost">Reset Wallet</button>
+          </div>
+        </section>
+      </div>
     </main>
     <script src="app.js"></script>
   </body>

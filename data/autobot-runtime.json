@@ -1,0 +1,885 @@
+{
+  "updatedAt": 1771420627589,
+  "lastClientHeartbeatAt": 1771420627313,
+  "aiSettings": {
+    "provider": "openai",
+    "model": "gpt-5-mini-2025-08-07",
+    "horizon": "short",
+    "autobotIntervalMins": 15,
+    "aiResearchAutoRefreshEnabled": true,
+    "aiResearchAutoRefreshMins": 60,
+    "addConfidenceMin": 80,
+    "addSentimentMin": 45,
+    "sellConfidenceMin": 60,
+    "sellSentimentMax": -5
+  },
+  "wallet": {
+    "cash": 100000,
+    "realizedPnl": 0,
+    "selectedSymbol": "QCOM",
+    "watchlist": [
+      "AAPL",
+      "NVDA",
+      "AMZN",
+      "META",
+      "JPM",
+      "V",
+      "MA",
+      "ABBV",
+      "KO",
+      "MRK",
+      "DIS",
+      "TMO",
+      "ABT",
+      "WFC",
+      "LIN",
+      "QCOM",
+      "AMGN"
+    ],
+    "lockedSymbols": [
+      "AAPL"
+    ],
+    "prices": {
+      "AAPL": {
+        "price": 264.14,
+        "lastClose": 255.76
+      },
+      "NVDA": {
+        "price": 187.4,
+        "lastClose": 182.78
+      },
+      "AMZN": {
+        "price": 201.25,
+        "lastClose": 198.82
+      },
+      "META": {
+        "price": 644.88,
+        "lastClose": 639.8
+      },
+      "JPM": {
+        "price": 307.15,
+        "lastClose": 302.54
+      },
+      "V": {
+        "price": 319.63,
+        "lastClose": 314.01
+      },
+      "MA": {
+        "price": 522.07,
+        "lastClose": 518.29
+      },
+      "ABBV": {
+        "price": 232.83,
+        "lastClose": 231.47
+      },
+      "KO": {
+        "price": 79.6,
+        "lastClose": 78.65
+      },
+      "MRK": {
+        "price": 121.64,
+        "lastClose": 121.39
+      },
+      "DIS": {
+        "price": 105.4,
+        "lastClose": 105.45
+      },
+      "TMO": {
+        "price": 501.55,
+        "lastClose": 504.86
+      },
+      "ABT": {
+        "price": 112.27,
+        "lastClose": 112.58
+      },
+      "WFC": {
+        "price": 87.42,
+        "lastClose": 86.95
+      },
+      "LIN": {
+        "price": 481.98,
+        "lastClose": 481.03
+      },
+      "QCOM": {
+        "price": 142.64,
+        "lastClose": 140.73
+      },
+      "AMGN": {
+        "price": 373.36,
+        "lastClose": 369.13
+      }
+    },
+    "positions": {},
+    "transactions": []
+  },
+  "aiResearchCache": {
+    "AAPL|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "AAPL",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771420570357,
+      "profile": {
+        "sentiment": 5,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Near-term trade-off: a March 4 product event could spark upside for a lower‑cost iPhone release, but Apple faces delayed Apple Intelligence/Siri feature rollouts and rising NAND memory costs that can compress near‑term margins and create event-driven volatility. Wait for post‑event clarity or a meaningful pullback before initiating a position. ([investors.com](https://www.investors.com/news/technology/apple-product-event-march-4-cheaper-iphone-no-ai-siri/?utm_source=openai))",
+        "catalyst": "Near term catalysts (days–weeks): Apple product event on March 4 — possible launch of a budget iPhone and refreshed products (price/feature reaction). Upcoming timing/rollout details for Apple Intelligence/Siri (reported delays to May/Sept) will drive sentiment. Component cost repricing (NAND flash) and any management commentary on margins at/after the event. ([investors.com](...",
+        "risk": "Key risks near term: (1) Further delays/negative headlines on Apple Intelligence/Siri depress investor appetite; (2) NAND flash price increases starting Q1 2026 that compress gross margins; (3) event disappointment or soft guidance at/around March 4 causing sharp intraday moves; (4) broader AI-spending narrative rotating away from Apple or regulatory/antitrust headlines. ([247...",
+        "brief": "HOLD (no entry). Short horizon: avoid initiating before the March 4 event — monitor event announcements and any new margin/cost commentary; consider buying only after clear product/AI delivery signals or on a confirmed pullback. ([investors.com](https://www.investors.com/news/technology/apple-product-event-march-4-cheaper-iphone-no-ai-siri/?utm_source=openai))"
+      }
+    },
+    "ABBV|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "ABBV",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771420523826,
+      "profile": {
+        "sentiment": 5,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD — do not open a new short‑term position. News in the last 72 hours is limited to minor developments (a small Mubadala SEC filing and modest after‑hours weakness) and analyst/coverage commentary noting post‑Q4 weakness; there are no material near‑term fundamental catalysts to drive a reliable days‑to‑weeks trade. ([sahmcapital.com](https://www.sahmcapital.com/news/content/brief-mubadala-investment-co-pjsc-reports-share-stake-in-pfizer-abbvie-dissolves-in-merck-dell-2026-02-17?utm_source=openai))",
+        "catalyst": "No clear positive catalysts within days–weeks in the latest 72‑hour window; watch for trading flows, intraday technical breakout or any unexpected trial/regulatory headlines. Recent coverage lists continued post‑earnings price pressure and broader analyst monitoring rather than fresh upside triggers. ([zacks.com](https://www.zacks.com/stock/news/2870286/abbvie-down-since-q4-ea...",
+        "risk": "Short‑term risks include further post‑earnings weakness, negative trial/regulatory news, or broad market selloffs that can amplify moves; after‑hours dip and modest institutional filing indicate possible low‑liquidity/flow sensitivity in the near term. Technical/back‑test metrics show reasonable risk‑adjusted returns historically but do not substitute for a lack of fresh catal...",
+        "brief": "HOLD (no entry). Short horizon: limited recent news (small stake filing, after‑hours drift) and analyst commentary pointing to post‑Q4 weakness—wait for a clear catalyst or stronger technical setup before buying. ([sahmcapital.com](https://www.sahmcapital.com/news/content/brief-mubadala-investment-co-pjsc-reports-share-stake-in-pfizer-abbvie-dissolves-in-merck-dell-2026-02-17?utm_source=openai))"
+      }
+    },
+    "MA|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "MA",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771420246620,
+      "profile": {
+        "sentiment": 12,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Hold (no entry). Near-term view is neutral-to-slightly-positive: Mastercard demonstrated a fully authenticated agentic commerce payment in India (positive proof‑point for growth in Asia) but the rollout remains subject to regulatory approval and governance, and UK/European moves to build sovereign rails introduce policy/competition noise — not enough fresh catalysts to open a new short‑term position. ([business-standard.com](https://www.business-standard.com/technology/tech-news/mastercard-agentic-commerce-transac...",
+        "catalyst": "Near‑term catalysts (days–weeks): incremental announcements/partner pilots or commercialization timelines for agentic commerce in APAC; Bank of England / DeliveryCo implementation news or government statements that could affect UK payments routing; headline-driven flows around regulatory proposals or sanction/geopolitical stories. ([business-standard.com](https://www.business-...",
+        "risk": "Event risks: regulatory/approval delays for AI‑led payments (fraud/consumer‑protection scrutiny), policy moves toward domestic UK/EU payment rails that could pressure fees or create execution uncertainty, and headline geopolitics that can trigger intraday volatility. ([m.economictimes.com](https://m.economictimes.com/tech/artificial-intelligence/mastercards-ai-agent-led-pay-aw...",
+        "brief": "Recommendation: HOLD (watch/no‑entry). Positive technical/innovation headlines from India support medium‑term upside but regulatory and sovereign‑rails headlines create near‑term event risk; wait for clear commercialization/proof points or a pullback before initiating. ([business-standard.com](https://www.business-standard.com/technology/tech-news/mastercard-agentic-commerce-transaction-india-ai-impact-summit-126021700983_1.html?utm_source=openai))"
+      }
+    },
+    "V|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "V",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771419722624,
+      "profile": {
+        "sentiment": 15,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Visa's own VisaNet data shows a meaningful opening‑weekend boost from Milano Cortina 2026—over 60% increase in overseas Visa cardholder visits and strong YoY spending growth (U.S. +125%), with contactless transactions up ~40%—supporting near‑term transaction volume upside but likely temporary and at least partly priced into the recent rally. ([investor.visa.com](https://investor.visa.com/news/news-details/2026/Italy-Sees-Economic-Boost-From-the-Opening-Weekend-of-the-Olympic-Winter-Games-Milano-Co...",
+        "catalyst": "Near‑term catalysts: (1) Ongoing Milano Cortina Winter Games (Feb 6–22) sustaining elevated travel and cross‑border card spend; (2) Visa activations (MiCo Fan Village, merchant programs) that can lift local penetration and transaction frequency during the Games. These are days‑to‑weeks catalysts to monitor. ([investor.visa.com](https://investor.visa.com/news/news-details/2026/...",
+        "risk": "Main near‑term risks: the Olympic spending uplift is event‑driven and may revert quickly after the Games, reducing volume momentum; travel/venue disruptions or weaker tourist flows could cut transaction growth; market already shows intraday strength, compressing short‑term upside vs. drawdown risk. ([investor.visa.com](https://investor.visa.com/news/news-details/2026/Italy-See...",
+        "brief": "Recommendation: HOLD (no new position). Positive, event‑driven volume lift from Milano Cortina 2026 is visible but likely transient; wait for post‑Games confirmation or a pullback/pattern that improves risk/reward before buying."
+      }
+    },
+    "JPM|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "JPM",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771419556780,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Hold (no entry). Recent media reports say JPMorgan will open >160 U.S. branches in 2026 and is expected to formally announce the expansion, which supports deposit growth longer-term but is not a clear short‑term buy trigger; the pending announcement may create intraday volatility so wait for confirmed detail or follow‑through before initiating a position. ([streetinsider.com](https://www.streetinsider.com/Reuters/JPMorgan%2Baims%2Bto%2Bopen%2Bover%2B160%2Bbranches%2Bin%2B2026%2C%2BFT%2Breports/26016498.html?utm_so...",
+        "catalyst": "1) Official JPMorgan/Chase expansion announcement (reported for Feb 18) — potential intraday volatility and guidance on rollout/timing. ([streetinsider.com](https://www.streetinsider.com/Reuters/JPMorgan%2Baims%2Bto%2Bopen%2Bover%2B160%2Bbranches%2Bin%2B2026%2C%2BFT%2Breports/26016498.html?utm_source=openai)) 2) Short‑term market reaction to deposit/in‑branch guidance and any ...",
+        "risk": "Execution risk on a large branch rollout (costs/timing vs. deposit gains); macro/rate moves or adverse regulatory changes that compress NII or raise capital requirements; near‑term sentiment swings around executive Form 4 disclosures even when executed under 10b5‑1. ([stocktitan.net](https://www.stocktitan.net/sec-filings/JPM/form-4-jpmorgan-chase-co-insider-trading-activity-4...",
+        "brief": "Hold/no entry. News of a >160‑branch 2026 expansion (reported Feb 18) is structurally positive but long‑dated; CFO’s Feb 17 sale was reported under a 10b5‑1 plan. Wait for the formal announcement and intraday confirmation before buying. ([streetinsider.com](https://www.streetinsider.com/Reuters/JPMorgan%2Baims%2Bto%2Bopen%2Bover%2B160%2Bbranches%2Bin%2B2026%2C%2BFT%2Breports/26016498.html?utm_source=openai))"
+      }
+    },
+    "AMGN|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "AMGN",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418733695,
+      "profile": {
+        "sentiment": 25,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). AMGN shows short-term upside (last reported $373.36, +1.13% on Feb 17) but volume remains below the 50‑day average; recent coverage highlighting dual drug approvals and small institutional stake changes gives a mildly positive bias, yet there is not enough fresh high‑conviction news or higher liquidity to initiate a new short‑term position now. ([marketwatch.com](https://www.marketwatch.com/data-news/amgen-inc-stock-outperforms-competitors-on-strong-trading-day-6d692202-14a66d02a1bf?utm_source=ope...",
+        "catalyst": "Near-term catalysts (days–weeks): market reaction/coverage related to recent drug approvals and regulatory news (can drive momentum) and incremental institutional flows/filings reported today — these items could fuel short-term moves. Monitor headlines and any management/investor webcast commentary for fresh directional info. ([tikr.com](https://www.tikr.com/ja/blog/amgen-stoc...",
+        "risk": "Event/volatility risk from limited liquidity (low trading volume vs. 50‑day average) — moves can overshoot on headlines; news fatigue or profit‑taking after recent gains could produce downside. Evidence of outsized risk in the tape today given lighter volume. ([marketwatch.com](https://www.marketwatch.com/data-news/amgen-inc-stock-outperforms-competitors-on-strong-trading-day-...",
+        "brief": "Recommendation: HOLD (no entry). Mildly positive momentum supported by recent approvals coverage and small institutional buying, but low volume and absent a clear high‑conviction catalyst keep short‑term conviction moderate; wait for higher volume breakout or a clear event outcome before buying. ([marketwatch.com](https://www.marketwatch.com/data-news/amgen-inc-stock-outperforms-competitors-on-strong-trading-day-6d692202-14a66d02a1bf?utm_source=openai))"
+      }
+    },
+    "QCOM|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "QCOM",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418589585,
+      "profile": {
+        "sentiment": 22,
+        "confidence": 65,
+        "action": "BUY",
+        "buyCashPct": 0.1,
+        "trimPositionPct": 0.05,
+        "thesis": "Buy (add-to-position) a small, tactical stake: QCOM has shown short-term buying interest with consecutive-session gains and elevated volume, and technicals read as oversold which supports a near-term bounce into device launches. Near-term upside is driven by Samsung’s Galaxy Unpacked (Feb 25) demand read-through and positive corporate headlines around a $150M India AI venture fund; downside is still present from memory-supply pressure and handset supply risks. ([marketwatch.com](https://www.marketwatch.com/data-ne...",
+        "catalyst": "1) Samsung Galaxy Unpacked on Feb 25 — premium Android launch could boost Snapdragon content if device demand is healthy. ([meyka.com](https://meyka.com/blog/qcom-stock-today-holiday-reopen-puts-memory-squeeze-in-focus-february-17-1702/?utm_source=openai)) 2) Short-term technical bounce: recent consecutive gains, above-average volume and oversold RSI suggest mean-reversion tra...",
+        "risk": "1) Memory/DRAM squeeze raising component costs and constraining handset supply or orders — could depress near-term revenue/gross margins. ([coincentral.com](https://coincentral.com/qualcomm-qcom-stock-gains-memory-chip-squeeze-february-2026/?utm_source=openai)) 2) Event risk around Feb 25 (product reception, supply disclosures) can trigger volatility in days-to-weeks. ([meyka....",
+        "brief": "Recommendation: BUY (add-to-position). Deploy ~10% of cash (speculative short-horizon stake) to play a potential bounce into Samsung’s Feb 25 device event and near-term sentiment catalysts; keep position small given memory/supply event risk and watch volume/guide-related headlines closely. ([marketwatch.com](https://www.marketwatch.com/data-news/qualcomm-inc-stock-outperforms-competitors-on-strong-trading-day-e8ae7611-048019b0047c?utm_source=openai))"
+      }
+    },
+    "AMZN|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "AMZN",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418515521,
+      "profile": {
+        "sentiment": 12,
+        "confidence": 65,
+        "action": "BUY",
+        "buyCashPct": 0.1,
+        "trimPositionPct": 0.05,
+        "thesis": "Buy (open a small, tactical position ~10% of cash). AMZN is trading after a multi-session selloff driven by investor concern over aggressive AI-related capex, but short-term technicals are oversold and recent intraday rebounds suggest scope for a days-to-weeks recovery; use a small entry to capture a potential mean-reversion while keeping size limited vs. event risk. ([zacks.com](https://www.zacks.com/stock/news/2870464/amazon%27s-losing-streak-extends-as-ai-jitters-weigh-on-tech?utm_source=openai))",
+        "catalyst": "Near-term catalysts: (1) technical oversold/RSI-driven bounces and short-covering after the multi-day slide; (2) continued AWS commercial wins and government/enterprise deals that re-affirm cloud demand (supporting near-term sentiment); (3) broader tech/AI risk sentiment stabilizing over coming sessions. ([thestreet.com](https://www.thestreet.com/investing/stocks/amazon-stock-...",
+        "risk": "Primary short-horizon risks: investor pushback on Amazon’s high AI/data-center spending that could reopen selling pressure and depress multiple (narrative persists), plus broader Magnificent Seven/tech-sector weakness that can overwhelm any idiosyncratic bounce. Manage size and use stop or hedges. ([zacks.com](https://www.zacks.com/stock/news/2870464/amazon%27s-losing-streak-e...",
+        "brief": "Buy a small, tactical position (~10% of cash) to trade a likely short-term oversold bounce; keep size limited given ongoing AI-capex narrative and sector volatility. ([ir.aboutamazon.com](https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Fourth-Quarter-Results/default.aspx?utm_source=openai))"
+      }
+    },
+    "NVDA|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "NVDA",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418446701,
+      "profile": {
+        "sentiment": 20,
+        "confidence": 70,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD — do not initiate a new NVDA position ahead of the company’s Feb 25, 2026 earnings release. The Feb 17–18 multi‑year agreement with Meta materially strengthens revenue visibility for current and next‑gen Blackwell/Rubin GPUs and standalone Grace/Vera CPUs, supporting near‑term demand expectations. ([investing.com](https://www.investing.com/news/stock-market-news/nvidia-to-sell-meta-millions-of-chips-in-multiyear-deal-4509719?utm_source=openai))",
+        "catalyst": "1) Meta multiyear commitment to buy “millions” of Nvidia processors (positive revenue visibility). ([investing.com](https://www.investing.com/news/stock-market-news/nvidia-to-sell-meta-millions-of-chips-in-multiyear-deal-4509719?utm_source=openai)) 2) NVDA Q4/FY2026 earnings and guidance release scheduled Feb 25, 2026 (high short‑term volatility potential). ([stocktitan.net](h...",
+        "risk": "1) Earnings/guide disappointment or conservative commentary on China/H20 exposure could trigger sharp downside into/after Feb 25. ([stocktitan.net](https://www.stocktitan.net/news/NVDA/nvidia-sets-conference-call-for-fourth-quarter-financial-fj54nsdx1oon.html?utm_source=openai)) 2) Concentration risk from large cloud/customers — Meta is a material customer (reported share refe...",
+        "brief": "Recommendation: HOLD (no new buy). Positive near‑term news (Meta deal) improves demand visibility, but Feb 25 earnings are a key near‑term event that creates asymmetric risk for a short (days–weeks) horizon — wait for post‑earnings clarity before entering. ([investing.com](https://www.investing.com/news/stock-market-news/nvidia-to-sell-meta-millions-of-chips-in-multiyear-deal-4509719?utm_source=openai))"
+      }
+    },
+    "INTC|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "INTC",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418401547,
+      "profile": {
+        "sentiment": -15,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry). Near-term (days–weeks) the tape shows Intel underperforming peers and sector rotation toward equipment/foundry winners while market optimism appears priced in; without clear, immediate supply/yield improvement or a positive catalyst I recommend not opening a new position. ([ainvest.com](https://www.ainvest.com/news/intel-turnaround-priced-happening-2602/?utm_source=openai))",
+        "catalyst": "Key near-term catalysts to monitor: (1) fresh supply/yield updates or foundry customer announcements, (2) analyst commentary/target changes and intraday sector flows, and (3) a surge in trade volume or large buy-side interest — any of these could move the stock within days–weeks. ([ainvest.com](https://www.ainvest.com/news/intel-turnaround-priced-happening-2602/?utm_source=ope...",
+        "risk": "Downside: continued sector rotation, disappointing supply/execution progress or weak order flow could push price lower in the short run. Upside risk: visible, rapid improvements in yields/supply or a material foundry/customer win. Monitor volume and analyst notes for confirmation. ([pandaforecast.com](https://pandaforecast.com/stock_forecasts/forecast_intc/?utm_source=openai))",
+        "brief": "Do not buy now — HOLD (watch/no-entry). Recent headlines show Intel retreating and sector divergence; wait for confirmed supply/yield or demand catalysts before initiating a position. ([marketwatch.com](https://www.marketwatch.com/data-news/intel-corp-stock-underperforms-tuesday-when-compared-to-competitors-52f8aefd-3c8cec5e775a?utm_source=openai))"
+      }
+    },
+    "META|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "META",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418330646,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Near-term: stay on the sidelines (no entry). Meta’s announcement of a multiyear, large-scale NVIDIA deployment supports AI performance and is a constructive near-term revenue/efficiency signal; however Mark Zuckerberg’s live testimony this week creates headline-driven event risk and volatility. Wait for post-testimony clarity or a pullback before initiating a short-horizon trade. ([investor.nvidia.com](https://investor.nvidia.com/news/press-release-details/2026/Meta-Builds-AI-Infrastructure-With-NVIDIA/default.asp...",
+        "catalyst": "Positive: details/rollout cadence and analyst responses to the Meta–NVIDIA multiyear deployment (news flow on chip volumes, timing, cost). ([investor.nvidia.com](https://investor.nvidia.com/news/press-release-details/2026/Meta-Builds-AI-Infrastructure-With-NVIDIA/default.aspx?utm_source=openai))\nNegative/volatility: live courtroom testimony and daily trial coverage; any damagi...",
+        "risk": "High near-term event risk from the social-harm lawsuit and Zuckerberg testimony (headline sensitivity); execution and margin pressure from large AI infrastructure projects if costs or timelines worsen (market reaction already noted). ([apnews.com](https://apnews.com/article/c8cbaa32ccbf4933ec3a7beebd6cf34b?utm_source=openai))",
+        "brief": "Recommendation: HOLD (no entry). Do not buy into headline-driven uplift; monitor trial developments and concrete NVIDIA deployment/analyst detail. Consider buying only after (1) trial headlines normalize or (2) a clear pullback/confirmed technical setup — otherwise stay flat."
+      }
+    },
+    "LIN|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "LIN",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418283105,
+      "profile": {
+        "sentiment": 15,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry): Near-term setup is mixed — short interest has fallen materially (Jan short interest down ~12.5% to ~6.51M shares, ~1.4% of float), which reduces immediate bearish pressure, but there is no fresh positive fundamental trigger in the last 72 hours to justify initiating a new short-term position. Monitor conference commentary before adding. ([defenseworld.net](https://www.defenseworld.net/2026/02/17/linde-plc-nasdaqlin-sees-significant-decline-in-short-interest.html))",
+        "catalyst": "1) Investor presentations at Citi (Feb 17) and Barclays Industrial Select (Feb 18) — management commentary/Q&A could drive intraday/near-term moves. ([us.trendlyne.com](https://us.trendlyne.com/us/equity/board-meeting/LIN/1404072/linde-plc-board_meeting/)) 2) Short-interest decline and low days-to-cover (~2.7 days) reduce squeeze risk but can still compress volatility around e...",
+        "risk": "Conference remarks or guidance nuances can cause gap moves; event-driven headlines (contracts, project delays, or margin commentary) could push price either way. Days-to-cover ~2.7 implies limited short-covering liquidity pressure but still possible short-term spikes. ([defenseworld.net](https://www.defenseworld.net/2026/02/17/linde-plc-nasdaqlin-sees-significant-decline-in-sh...",
+        "brief": "Do not enter new position now — HOLD/watch. Wait for post-conference confirmation (concrete order/project or improved guidance) or a clear technical breakout with volume before buying."
+      }
+    },
+    "WFC|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "WFC",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771418128546,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 55,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no new entry). No material Wells Fargo–specific news or near-term catalysts were identified in the last 3 days; the stock is trading around $87 and closed near $87.40 on Feb 17, while consensus analyst targets imply mid‑term upside (~$103). ([chartmill.com](https://www.chartmill.com/stock/quote/WFC/analyst-ratings?utm_source=openai))",
+        "catalyst": "Near term catalysts to monitor: macro prints (CPI/jobs/Fed guidance) and bank‑sector flows which could drive volatile moves; absent company headlines in the past 3 days there is no company-specific catalyst to justify a short‑term buy. ([marketwatch.com](https://www.marketwatch.com/data-news/goldman-sachs-group-inc-stock-outperforms-competitors-on-strong-trading-day-5859a56d-c...",
+        "risk": "Short‑term event risk: adverse macro surprises or sudden bank‑sector news/regulatory headlines that can cause rapid downside; liquidity/volume spikes around sector rotation could amplify moves.",
+        "brief": "Recommendation: HOLD (watch/no‑entry). No fresh company news in the past 3 days; maintain cash and monitor macro and sector headlines before initiating a position. ([chartmill.com](https://www.chartmill.com/stock/quote/WFC/analyst-ratings?utm_source=openai))"
+      }
+    },
+    "ABT|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "ABT",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417956031,
+      "profile": {
+        "sentiment": 5,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Hold (no entry). Abbott is range-bound near $112 and technical indicators are neutral; the primary near-term driver is the Exact Sciences acquisition vote and integration risk rather than company-specific earnings this week. Wait for the binary merger outcome or clearer technical confirmation before initiating a new position. ([investing.com](https://www.investing.com/equities/abbott-laboratories?utm_source=openai))",
+        "catalyst": "Immediate catalyst: Exact Sciences shareholder vote scheduled Feb 20, 2026 — a clean approval would remove a major overhang and likely support ABT; a contested vote/regulatory delay or adverse legal developments would create downside volatility within days. Secondary catalysts: sector/device news and quarterly flows that could move medtech peers and ABT. ([ainvest.com](https:/...",
+        "risk": "Near-term binary event risk from the Exact Sciences merger vote and potential regulatory/ litigation overhang; sector/device headlines or macro risk could spark quick moves; technical neutrality increases chance of whipsaw. ([ainvest.com](https://www.ainvest.com/news/exact-sciences-merger-hangover-price-priced-perfection-2602/?utm_source=openai))",
+        "brief": "Recommendation: HOLD (do not enter). Rationale: neutral technicals and a binary merger catalyst (Exact Sciences vote on Feb 20) create short-term event risk; monitor vote outcome and intraday technical breaks for a buy trigger. Key items to watch: Feb 20 vote result and any regulator/legal updates, ABT intraday support at ~$111 and conviction above recent resistance near ~$114. ([ainvest.com](https://www.ainvest.com/news/exact-sciences-merger-hangover-price-priced-perfection-2602/?utm_source=openai))"
+      }
+    },
+    "TMO|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "TMO",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417820578,
+      "profile": {
+        "sentiment": 12,
+        "confidence": 60,
+        "action": "BUY",
+        "buyCashPct": 0.1,
+        "trimPositionPct": 0.05,
+        "thesis": "Buy a small, tactical position (enter a new position). TMO is technically oversold on short-term indicators (RSI ~21, STOCH, MACD showing oversold readings) and is trading near short-term pivot/support levels where mean-reversion bounces are common; however, the stock remains below most intermediate moving averages, so this is a tactical, not a conviction, trade. ([tipranks.com](https://www.tipranks.com/stocks/tmo/technical-analysis))",
+        "catalyst": "Near-term catalyst is technical mean-reversion: extreme short-term oversold indicators and proximity to pivot/support (~510 pivot, S1 ~493) that often trigger short-covering and momentum buying in days–weeks. Intraday/weekly bounce reversal would be the immediate catalyst for gains. ([tipranks.com](https://www.tipranks.com/stocks/tmo/technical-analysis))",
+        "risk": "Downtrend remains intact (price below 10/20/50/100-day MAs); failure to hold the first pivot/support (~493) can expose S2 ~477 and S3 ~460 — downside amplified by broader market weakness or news-driven volatility. Position is event- and momentum-sensitive. ([tipranks.com](https://www.tipranks.com/stocks/tmo/technical-analysis))",
+        "brief": "Recommendation: BUY (enter small, tactical position — allocate 10% of available cash). Rationale: short-term technicals oversold with nearby pivot support suggesting a bounce; risk: broader moving-average downtrend and support failure could produce further declines. Hold for days–weeks; trim/exit quickly if price breaks below S2/S3. ([tipranks.com](https://www.tipranks.com/stocks/tmo/technical-analysis))"
+      }
+    },
+    "ORCL|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "ORCL",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417687438,
+      "profile": {
+        "sentiment": -20,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Short-term outlook is cautious: ORCL is trading in a volatile down/mean‑reversion regime driven by sector-wide ‘AI panic’ and investor concern about Oracle’s large 2026 financing plan and execution risk, so do not initiate a new position until price action and funding clarity stabilize. ([markets.chroniclejournal.com](https://markets.chroniclejournal.com/chroniclejournal/article/stockstory-2026-2-17-why-oracle-orcl-shares-are-trading-lower-today))",
+        "catalyst": "Near-term catalysts (days–weeks): 1) Continued AI‑sector headlines and analyst flow that can drive rapid moves. ([markets.chroniclejournal.com](https://markets.chroniclejournal.com/chroniclejournal/article/stockstory-2026-2-17-why-oracle-orcl-shares-are-trading-lower-today)) 2) Any concrete financing execution (equity/debt issuance or ATM filings) or dilution details that clar...",
+        "risk": "Key near-term risks: 1) Funding/dilution shock or higher-than-expected equity issuance tied to the $45–50B plan, which can drive further downside. ([tipranks.com](https://www.tipranks.com/news/oracle-stock-orcl-rises-on-new-u-s-air-force-cloud-contract)) 2) Securities-class actions / litigation noise that increase uncertainty and pressuring sentiment. ([barchart.com](https://w...",
+        "brief": "Recommend HOLD (no entry). Short horizon: wait for either clear funding execution + market digestion or a technical rebound and reduced headline volatility before considering a buy. Monitor financing announcements, legal filings, and sector headlines. ([tipranks.com](https://www.tipranks.com/news/oracle-stock-orcl-rises-on-new-u-s-air-force-cloud-contract))"
+      }
+    },
+    "DIS|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "DIS",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417502552,
+      "profile": {
+        "sentiment": 5,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Near-term view neutral: Disney has positive content and parks tailwinds (new Disney+ releases this week and Disneyland Paris 'World of Frozen' opening announced), but cross-market volatility from active M&A in the media sector (Warner/Paramount/Netflix bidding developments) raises event risk — avoid initiating a new short‑horizon position until headlines and technicals settle. ([whatsondisneyplus.com](https://whatsondisneyplus.com/whats-coming-to-disney-in-february-2026-us/?utm_source=openai))",
+        "catalyst": "1) Continued developments in the Warner Bros. Discovery bidding window — any decisive movement or regulatory news could move media peers in days. ([wbd.com](https://www.wbd.com/news/warner-bros-discovery-sets-special-meeting-date-march-20-2026-and-unanimously-recommends?utm_source=openai)) 2) Near-term Disney+ content releases and programming schedule this week that can suppor...",
+        "risk": "Short-horizon risks: sector M&A headline volatility (WBD/Paramount/Netflix discussions) that can swing media multiples; weaker-than-expected content/streaming engagement or negative parks operational news; macro/market risk causing technical breakdowns. ([wbd.com](https://www.wbd.com/news/warner-bros-discovery-sets-special-meeting-date-march-20-2026-and-unanimously-recommends?...",
+        "brief": "HOLD — do not buy now. Content and parks catalysts exist but are outweighed in the short term by elevated event/sector M&A risk; wait for clearer news flow or technical confirmation before entering. ([whatsondisneyplus.com](https://whatsondisneyplus.com/whats-coming-to-disney-in-february-2026-us/?utm_source=openai))"
+      }
+    },
+    "WMT|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "WMT",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417343939,
+      "profile": {
+        "sentiment": -10,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry). Do not buy WMT ahead of FY2026 Q4 earnings scheduled before the U.S. open on Feb 19, 2026 — near-term event risk (guidance) and a stretched valuation after a strong YTD run increase the odds of a volatile post‑earnings move; wait for the report or a clear pullback before opening a position. ([corporate.walmart.com](https://corporate.walmart.com/news/events?utm_source=openai))",
+        "catalyst": "Immediate catalyst: FY2026 Q4 earnings release and management guidance (pre‑market Feb 19) — analysts expect solid Q4 results but flag conservative full‑year guidance and potential ~5% stock move around the print. Watch guidance on sales/margin, U.S. comps, e‑commerce/ad growth and commentary on tariffs/macroeconomic trends. ([corporate.walmart.com](https://corporate.walmart.c...",
+        "risk": "Near-term risks: 1) Conservative/tepid FY guidance that disappoints consensus (Evercore/analyst notes); 2) profit‑taking after a strong YTD rally and elevated forward P/E / technical overbought readings; 3) macro/tariff commentary that could push broader retail weakness. Any one could trigger a >5% gap. ([m.investing.com](https://m.investing.com/news/stock-market-news/these-an...",
+        "brief": "Do not open a new WMT position now — HOLD/no-entry into the Feb 19 earnings print; reassess after the report or on a significant pullback. ([corporate.walmart.com](https://corporate.walmart.com/news/events?utm_source=openai))"
+      }
+    },
+    "MRK|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "MRK",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417243149,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Merck shows near-term regulatory momentum — Health Canada approved KEYTRUDA SC™ on Feb 17, 2026 — but there are limited U.S.-market catalysts in the next few trading days and the stock is trading near recent highs, so for a short (days–weeks) horizon the trade is watchful rather than an entry. ([biospace.com](https://www.biospace.com/press-releases/health-canada-approves-keytruda-sc-a-subcutaneous-formulation-of-pembrolizumab-across-multiple-cancer-indications?utm_source=openai))",
+        "catalyst": "1) Health Canada approval of KEYTRUDA SC™ (Feb 17, 2026) — potential commercialization/reimbursement timelines to watch. ([biospace.com](https://www.biospace.com/press-releases/health-canada-approves-keytruda-sc-a-subcutaneous-formulation-of-pembrolizumab-across-multiple-cancer-indications?utm_source=openai))  \n2) Recent regulatory momentum from KEYTRUDA label expansions (note...",
+        "risk": "1) Material long‑term risk from KEYTRUDA patent/exclusivity erosion and competitive pressure; Merck’s strategy to replace Keytruda revenue remains execution‑dependent. ([ainvest.com](https://www.ainvest.com/news/merck-structural-shift-navigating-keytruda-cliff-70b-pipeline-future-2602/?utm_source=openai))  \n2) Commercial rollout and payer/reimbursement delays for new formulati...",
+        "brief": "HOLD — do not open a new position now. Positive regulatory headlines (Keytruda SC Canada approval) are supportive but near‑term U.S. catalysts are limited; monitor commercialization/reimbursement updates and the March 16 ex‑dividend date. ([biospace.com](https://www.biospace.com/press-releases/health-canada-approves-keytruda-sc-a-subcutaneous-formulation-of-pembrolizumab-across-multiple-cancer-indications?utm_source=openai))"
+      }
+    },
+    "KO|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "KO",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771417059532,
+      "profile": {
+        "sentiment": 15,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (do not initiate new position). KO showed short-term bullish price action after management spoke at CAGNY, trading up and sitting just below its 52-week high, but the move is on below-average volume and near-term upside looks limited absent a confirmed breakout. ([marketwatch.com](https://www.marketwatch.com/data-news/coca-cola-co-stock-outperforms-competitors-on-strong-trading-day-feec400e-2f91354341e3?utm_source=openai))",
+        "catalyst": "Near-term triggers: (1) follow-through or failure to break and hold above the $80.4 52-week high (technical confirmation/volume). (2) Any analyst revisions or incremental details from the CAGNY presentation and management commentary being published/clarified in the next days. ([marketwatch.com](https://www.marketwatch.com/data-news/coca-cola-co-stock-outperforms-competitors-on...",
+        "risk": "Event/operational risks include legacy impairments and portfolio actions that have pressured earnings (BODYARMOR write-down noted in recent coverage), plus divestiture/headwind guidance that can weigh near term; technically, the stock is close to prior highs on light volume (failed breakouts risk a pullback). ([247wallst.com](https://247wallst.com/investing/2026/02/17/warren-b...",
+        "brief": "Recommendation: HOLD (no new entry). Recent CAGNY messaging and price strength are constructive but volume is light and headwinds (impairment/divestiture impacts) keep short-term risk elevated—wait for confirmation or a pullback before buying. ([gurufocus.com](https://www.gurufocus.com/news/8624489/cocacola-co-at-consumer-analyst-group-of-new-york-cagny-conference-transcript?utm_source=openai))"
+      }
+    },
+    "BAC|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "BAC",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771416886384,
+      "profile": {
+        "sentiment": -10,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD — do not initiate a new BAC position now. Near-term headline and policy risk (Fed minutes Feb 18; fast-tracked Epstein-related litigation with discovery deadlines) create elevated short-term volatility and event risk, while intraday price action is muted versus last close. ([moneycontrol.com](https://www.moneycontrol.com/news/business/commodities/gold-and-silver-regain-ground-ahead-of-fed-minutes-release-13834339.html?utm_source=openai))",
+        "catalyst": "(1) Federal Reserve minutes released Feb 18 could shift rate-cut expectations and move bank NII sentiment in days. ([moneycontrol.com](https://www.moneycontrol.com/news/business/commodities/gold-and-silver-regain-ground-ahead-of-fed-minutes-release-13834339.html?utm_source=openai)) (2) Litigation/calendar: a judge has fast-tracked Epstein-related claims against BofA with disco...",
+        "risk": "Legal headline risk (Epstein-related claims have accelerated discovery and trial scheduling) may produce adverse publicity or settlements; dovish Fed minutes or stronger-than-expected rate-cut pricing would pressure net interest income expectations for banks; broader market risk-off events could amplify downside. ([aol.com](https://www.aol.com/articles/judge-puts-epstein-victi...",
+        "brief": "Short-horizon recommendation: HOLD (no new entry). Near-term catalysts — Fed minutes today (Feb 18) and a fast-tracked Epstein lawsuit with a late‑Feb discovery window — increase headline-driven volatility; wait for post‑minutes clarity or resolution of immediate legal milestones before buying. Technical/price action is muted around $52.7. ([moneycontrol.com](https://www.moneycontrol.com/news/business/commodities/gold-and-silver-regain-ground-ahead-of-fed-minutes-release-13834339.html?utm_source=openai))"
+      }
+    },
+    "HD|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "HD",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771416433197,
+      "profile": {
+        "sentiment": -15,
+        "confidence": 70,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). HD is showing short-term technical weakness after failing at resistance and pulling back from ~$390; with earnings and mgmt guidance imminent, avoid initiating a new position until post‑earnings clarity. ([notes.hurstcycles.com](https://notes.hurstcycles.com/us-large-caps-in-focus-nvda-xom-hd-17-february-2026/))",
+        "catalyst": "Near-term: Q4/FY earnings and management commentaries scheduled Feb 24, 2026 (before market open) — primary short‑term volatility catalyst. Secondary: Presidents’ Day / promotional activity (Ryobi discounts) could modestly affect comps in the week. ([ir.homedepot.com](https://ir.homedepot.com/?utm_source=openai))",
+        "risk": "Earnings miss or cautious guidance could drive another leg down; weak housing/low turnover and cautious full‑year guidance reduce upside odds in days‑to‑weeks. Technical failure at resistance increases probability of short‑term selling. ([ainvest.com](https://www.ainvest.com/news/truist-405-target-betting-future-upcycle-current-reality-2602/))",
+        "brief": "Recommend HOLD / watch — do not buy before Feb 24 earnings; reassess after print and price reaction. Recent technicals are bearish and guidance/earnings are primary short‑term event risk; limited near‑term upside from promotions. ([notes.hurstcycles.com](https://notes.hurstcycles.com/us-large-caps-in-focus-nvda-xom-hd-17-february-2026/))"
+      }
+    },
+    "PG|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "PG",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771416209410,
+      "profile": {
+        "sentiment": 0,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no position). Do not initiate a new position on the short horizon — Procter & Gamble is large-cap, low-volatility consumer staples with limited near-term upside catalysts and only a small intraday decline (159.51 vs 160.04). Wait for a clear technical setup (breakout or support confirmation) or a specific fundamental catalyst before buying.",
+        "catalyst": "Near-term catalysts that would change the view: company earnings release, monthly retail/consumer data, major macro prints (CPI, jobs) or retailer inventory updates; any clear technical breakout above recent highs or a sustained bounce from support.",
+        "risk": "Downside risks in the short term include negative macro headlines (weak consumer spending, adverse CPI/jobs), sector-wide risk-off moves, margin pressure from cost inflation, and headline-driven volatility; no strong short-term trigger observed.",
+        "brief": "Hold / watch — no-entry for now. Neutral short-term; small dip not actionable. Await clearer technical or fundamental catalysts before buying."
+      }
+    },
+    "UNH|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "UNH",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771416073640,
+      "profile": {
+        "sentiment": -10,
+        "confidence": 50,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry). With no current shares and only a slight intraday weakness (price 289.30 vs last close 293.34), there is no clear short-term buy signal in the provided data; wait for a technical rebound or explicit near-term catalyst before initiating a position.",
+        "catalyst": "Monitor short-term triggers: earnings/guidance releases, Medicare/Medicaid or regulatory updates, analyst actions, and a technical reversal above recent resistance/last close. None of these specific events are provided in the supplied data.",
+        "risk": "Event risk from policy/regulatory changes, reimbursement pressure, adverse earnings or guidance, and broad market volatility; limited short-term upside signal in the provided quote.",
+        "brief": "HOLD — do not enter a new position now; watch for clear short-term catalysts or technical confirmation before buying."
+      }
+    },
+    "BRK.B|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "BRK.B",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771415704928,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 55,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry). Price is modestly higher intraday (~+1.2%) but there are no clear company-specific near-term catalysts to justify initiating a short-horizon position. Prefer to wait for a defined technical setup or an event-driven entry (earnings, sizable portfolio disclosures, or macro/Fed-driven market moves).",
+        "catalyst": "Near-term catalysts that could move the stock: quarterly earnings/letters, major moves in Berkshire's large equity holdings, macro events (Fed rate decisions, risk-on/off market shifts), or large share transactions by insiders/investment stakes.",
+        "risk": "Short-term risks include broad market volatility/interest-rate moves, unexpected insurance or investment losses disclosed by Berkshire, and headline-driven swings in large correlated holdings; absence of immediate catalysts increases chance of noise-driven false signals.",
+        "brief": "No current position — recommend HOLD (watch for clearer short-term technical setup or event-driven entry)."
+      }
+    },
+    "AVGO|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "AVGO",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771415586001,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 60,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no-entry). AVGO is trading slightly above prior close (+1.1%) but there is no identified near-term catalyst in the provided data. With shares=0, recommend watching for a clear short-term trigger or technical setup before initiating a position.",
+        "catalyst": "Near-term catalysts to monitor: earnings/guidance release, sector/semiconductor demand datapoints, major M&A or regulatory announcements, and broad tech/macro risk events.",
+        "risk": "Short-term risks include an earnings miss or weak guidance, sudden semiconductor cyclical weakness, broad market/tech selloff, or headline-driven volatility—no dates provided for events.",
+        "brief": "Do not buy now — HOLD/watch (no-entry). Wait for a clear short-term catalyst or constructive technical breakout before committing cash."
+      }
+    },
+    "MSFT|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "MSFT",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771414193462,
+      "profile": {
+        "sentiment": -15,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Short-horizon: no new entry. Price is trading below prior close (396.76 vs 401.18) with intraday momentum to the downside and recent minute-level decline from the mid-400s into the low-400s. With no clear near-term bullish catalyst visible in the provided data, wait for technical stabilization (reclaim of ~401–404) before initiating a position.",
+        "catalyst": "Near-term triggers to watch: any company-level headlines/earnings or broader tech/macro moves that reverse current intraday weakness; technical reclaim of the 401–404 area would be a short-term bullish signal.",
+        "risk": "Downside continuation or gap lower in the days ahead; short-term volatility and broader tech weakness could push price further below recent close.",
+        "brief": "HOLD (no entry). Do not buy at current levels; wait for technical stabilization or a clear catalyst before allocating capital."
+      }
+    },
+    "GOOGL|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "GOOGL",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771414132809,
+      "profile": {
+        "sentiment": -25,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "Short horizon: do not enter. Price shows near-term technical weakness (current 300.85 < last close 305.71; intraday decline ~1.6% and recent 1-min candles trending down). No clear near-term catalyst in the provided data to justify buying into this sell-off.",
+        "catalyst": "Monitor short-term technicals: continuation or reversal of intraday momentum, recovery above the prior close (~305.7) or stabilizing price action on volume would be required to consider buying.",
+        "risk": "Further intraday/near-term selling and momentum-driven downside; entering now risks immediate short-term loss given the observed downtrend.",
+        "brief": "HOLD (no entry/watch). Do not buy now; wait for technical stabilization or a clear short-term reversal signal."
+      }
+    },
+    "TSLA|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "TSLA",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771413951116,
+      "profile": {
+        "sentiment": -20,
+        "confidence": 65,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Price is trading below prior close (410.22 vs 417.45, -1.73%) with short-term technical weakness and no near-term positive catalyst in the provided data. Prefer to wait for stabilization or a clear bullish technical signal before initiating a new short-term position.",
+        "catalyst": "Near-term triggers to consider: intraday reversal with sustained move back above prior close (~417.45) or strong volume-driven bounce; any company announcements/earnings or market-moving news (not present in dataset) would change the view.",
+        "risk": "High intraday volatility and gap risk; continued short-term downside if technical support near ~400 breaks; absence of confirmed catalysts increases probability of chop",
+        "brief": "HOLD (no entry). Short-term technicals mildly negative; wait for clear stabilization or positive catalyst before buying."
+      }
+    },
+    "AMD|openai|gpt-5-mini-2025-08-07|short": {
+      "symbol": "AMD",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "short",
+      "fetchedAt": 1771413789140,
+      "profile": {
+        "sentiment": -25,
+        "confidence": 70,
+        "action": "HOLD",
+        "buyCashPct": 0.01,
+        "trimPositionPct": 0.05,
+        "thesis": "HOLD (no entry). Price is down sharply intraday (~-6.1%) with negative short-term technical momentum and no confirmed near-term positive catalyst in the provided data; avoid initiating a new position until price stabilizes or a clear catalyst appears.",
+        "catalyst": "Watch for confirmed stabilization (retest/support hold), high-volume reversal, company news/earnings or guidance updates in the next days-weeks; absent these, expect continued volatility.",
+        "risk": "Near-term gap/ momentum continuation to lower levels, elevated volatility, and event-driven swings; lack of confirmed positive catalyst increases chance of further downside.",
+        "brief": "Short-term negative technicals and a sharp intraday drop suggest standing aside. Do not buy now; monitor for stabilization, news, or volume-confirmed reversal before entering."
+      }
+    },
+    "AMZN|openai|gpt-5-mini-2025-08-07|long": {
+      "symbol": "AMZN",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "long",
+      "fetchedAt": 1771399770468,
+      "profile": {
+        "sentiment": 40,
+        "confidence": 65,
+        "action": "BUY",
+        "buyCashPct": 0.15,
+        "trimPositionPct": 0.1,
+        "thesis": "Amazon.com is a very large, longstanding US retail platform (marketCapitalization 2,159,329.27; IPO 1997-05-15) whose scale and capital base support multi-quarter durability through investments in distribution, technology and customer reach, creating a structural moat versus smaller rivals.",
+        "catalyst": "Consistent multi-quarter top-line growth and margin stabilization from scale-driven unit economics and disciplined reinvestment; visible improvement in cash generation or successful new initiatives would accelerate appreciation.",
+        "risk": "High competitive intensity in retail, margin compression from price/fulfillment competition, regulatory and antitrust pressure, macro-driven consumer weakness, and execution risk on large-scale investments that could dilute returns.",
+        "brief": "Large-cap US retail leader with durable scale advantages; buy for long-term exposure to structural moat but monitor execution, margins and regulatory/competitive risks closely."
+      }
+    },
+    "AMZN|openai|gpt-5-mini-2025-08-07|swing": {
+      "symbol": "AMZN",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "swing",
+      "fetchedAt": 1771399405557,
+      "profile": {
+        "sentiment": 10,
+        "confidence": 40,
+        "action": "HOLD",
+        "buyCashPct": 0.1,
+        "trimPositionPct": 0.25,
+        "thesis": "Amazon.com Inc is a very large US-listed retail company (marketCap ~2.16M, shares outstanding 10,734.92). Current quote shows a small intraday uptick (201.25 vs last close 198.82). Over a 1–3 month swing horizon the stock is likely to be driven by quarterly earnings/guidance, top-line retail demand, and valuation sensitivity given its scale.",
+        "catalyst": "Upcoming quarterly earnings and management guidance, short-term consumer spending trends reflected in retail results, and price momentum around the current level (~$201). Institutional flows into large-cap names may amplify moves.",
+        "risk": "Limited visibility on near-term earnings/guidance can cause volatility; retail sector cyclicality and any negative guidance or macro weakness could compress valuation; large market cap can still see sharp swings on results or sentiment shifts.",
+        "brief": "Neutral-to-cautious swing view: small recent price uptick but position should be held for now pending earnings/guidance; opportunistic modest buy (10% cash) or trim (~25%) if exposure is already high."
+      }
+    },
+    "AAPL|openai|gpt-5-mini-2025-08-07|swing": {
+      "symbol": "AAPL",
+      "provider": "openai",
+      "model": "gpt-5-mini-2025-08-07",
+      "horizon": "swing",
+      "fetchedAt": 1771399288960,
+      "profile": {
+        "sentiment": 12,
+        "confidence": 70,
+        "action": "HOLD",
+        "buyCashPct": 0.1,
+        "trimPositionPct": 0.05,
+        "thesis": "Current price $263.93 is essentially in line with the implied market-cap-derived share price (~$263.49 = marketCapitalization / shareOutstanding). Intraday strength vs prior close (+~3.2%) shows momentum, but valuation is roughly fair; 1–3 month upside depends on earnings trajectory (revenue and margin trends) and positioning versus broader market moves.",
+        "catalyst": "Quarterly earnings and guidance, product/corporate announcements, macro consumer-spending data and benchmark index moves that re-rate large-cap tech multiples.",
+        "risk": "Earnings misses or slower revenue/margin growth, macro weakness, supply-chain or regulatory shocks, and rapid multiple contraction would push price materially below implied valuation.",
+        "brief": "Neutral short-term stance: price is near implied market-cap fair value with modest upside absent positive earnings/cadence beats; consider small add on meaningful dip and trim on strength."
+      }
+    }
+  },
+  "aiRefreshMeta": {
+    "AAPL": {
+      "addedAt": 1771403640306,
+      "lastUpdatedAt": 1771420570357,
+      "lastAttemptAt": 1771420570357
+    },
+    "NVDA": {
+      "addedAt": 1771403233225,
+      "lastUpdatedAt": 1771418446701,
+      "lastAttemptAt": 1771418446701
+    },
+    "AMZN": {
+      "addedAt": 1771403628462,
+      "lastUpdatedAt": 1771418515521,
+      "lastAttemptAt": 1771418515521
+    },
+    "META": {
+      "addedAt": 1771403278857,
+      "lastUpdatedAt": 1771418330646,
+      "lastAttemptAt": 1771418330646
+    },
+    "JPM": {
+      "addedAt": 1771415757199,
+      "lastUpdatedAt": 1771419556780,
+      "lastAttemptAt": 1771419556780
+    },
+    "V": {
+      "addedAt": 1771415951260,
+      "lastUpdatedAt": 1771419722624,
+      "lastAttemptAt": 1771419722624
+    },
+    "MA": {
+      "addedAt": 1771416553005,
+      "lastUpdatedAt": 1771420246620,
+      "lastAttemptAt": 1771420246620
+    },
+    "ABBV": {
+      "addedAt": 1771414719184,
+      "lastUpdatedAt": 1771420523826,
+      "lastAttemptAt": 1771420523826
+    },
+    "KO": {
+      "addedAt": 1771417057129,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "MRK": {
+      "addedAt": 1771417166535,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "DIS": {
+      "addedAt": 1771417434858,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "TMO": {
+      "addedAt": 1771417737388,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "ABT": {
+      "addedAt": 1771417891436,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "WFC": {
+      "addedAt": 1771418042703,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "LIN": {
+      "addedAt": 1771418207728,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "QCOM": {
+      "addedAt": 1771416109601,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    },
+    "AMGN": {
+      "addedAt": 1771416721004,
+      "lastUpdatedAt": 0,
+      "lastAttemptAt": 0
+    }
+  },
+  "marketScout": {
+    "enabled": false,
+    "intervalMins": 2,
+    "lastRunAt": 1771418658544,
+    "lastHotRefreshAt": 0,
+    "cursor": 26,
+    "lastSymbol": "AMGN",
+    "latestMessage": "Researched AMGN, Sentiment +25, Added to watchlist.",
+    "hotSummary": "",
+    "hotSymbols": [],
+    "recentMessages": [
+      "Researched AMGN, Sentiment +25, Added to watchlist.",
+      "Researched QCOM, Sentiment +22, Added to watchlist.",
+      "Researched INTC, Sentiment -15, No action.",
+      "Researched LIN, Sentiment +15, Added to watchlist.",
+      "Researched WFC, Sentiment +10, Added to watchlist.",
+      "Researched ABT, Sentiment +5, Added to watchlist.",
+      "Researched TMO, Sentiment +12, Added to watchlist.",
+      "Researched ORCL, Sentiment -20, No action.",
+      "Researched DIS, Sentiment +5, Added to watchlist.",
+      "Researched WMT, Sentiment -10, No action.",
+      "Researched MRK, Sentiment +10, Added to watchlist.",
+      "Researched KO, Sentiment +15, Added to watchlist.",
+      "Researched BAC, Sentiment -10, No action.",
+      "Researched ABBV, Sentiment +10, Added to watchlist.",
+      "Researched MA, Sentiment +15, Added to watchlist.",
+      "Researched HD, Sentiment -15, No action.",
+      "Researched PG, Sentiment 0, No action.",
+      "Researched UNH, Sentiment -10, No action.",
+      "Researched V, Sentiment +10, Added to watchlist.",
+      "Researched JPM, Sentiment +10, Added to watchlist.",
+      "Researched BRK.B, Sentiment +10, No action.",
+      "Researched AVGO, Sentiment +10, No action.",
+      "Researched AVGO, Sentiment +10, No action; removed MSFT (low sentiment).",
+      "Researched AVGO, Sentiment +10, No action; removed TSLA (low sentiment).",
+      "Researched AVGO, Sentiment +10, No action; removed AMD (low sentiment).",
+      "Researched AVGO, Sentiment +10, No action; removed GOOGL (low sentiment)."
+    ],
+    "checkedAtBySymbol": {
+      "AVGO": 1771415572030,
+      "BRK.B": 1771415692115,
+      "JPM": 1771415818541,
+      "V": 1771415938600,
+      "UNH": 1771416058643,
+      "PG": 1771416193688,
+      "HD": 1771416347232,
+      "MA": 1771416512305,
+      "ABBV": 1771416677373,
+      "BAC": 1771416827430,
+      "KO": 1771416992533,
+      "MRK": 1771417157620,
+      "WMT": 1771417307706,
+      "DIS": 1771417457770,
+      "ORCL": 1771417607861,
+      "TMO": 1771417757959,
+      "ABT": 1771417908106,
+      "WFC": 1771418073205,
+      "LIN": 1771418223301,
+      "INTC": 1771418373383,
+      "QCOM": 1771418538476,
+      "AMGN": 1771418658544
+    },
+    "createdAt": 1771415046170
+  },
+  "autobot": {
+    "enabled": false,
+    "lastRunAt": 1771419057404,
+    "latestThought": "US markets closed, reopen at Feb 18, 09:30 EST (18 Feb, 14:30 UTC).",
+    "latestRecommendation": {
+      "action": "HOLD",
+      "side": "hold",
+      "symbol": "",
+      "shares": 0,
+      "reason": "US markets closed, reopen at Feb 18, 09:30 EST (18 Feb, 14:30 UTC).",
+      "thought": "US markets closed, reopen at Feb 18, 09:30 EST (18 Feb, 14:30 UTC)."
+    },
+    "latestAutoAction": {
+      "type": "HOLD",
+      "symbol": "",
+      "shares": 0,
+      "reason": "US markets closed, reopen at Feb 18, 09:30 EST (18 Feb, 14:30 UTC).",
+      "executed": false,
+      "at": 1771419057404
+    },
+    "lastStatus": "Disabled",
+    "lastError": ""
+  }
+}
