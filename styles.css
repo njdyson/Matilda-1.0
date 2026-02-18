@@ -145,6 +145,18 @@ body::before {
   margin-bottom: 0.78rem;
 }
 
+.autobot-settings-accordion {
+  margin-bottom: 0.62rem;
+}
+
+.autobot-settings-box {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.autobot-settings-box .autobot-model-setting {
+  grid-column: 1 / -1;
+}
+
 .ai-settings-box .checkbox-setting {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -291,7 +303,7 @@ h1 {
 .summary-grid {
   display: grid;
   gap: 0.8rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   margin-bottom: 1rem;
 }
 
@@ -344,19 +356,23 @@ h1 {
   animation-delay: 160ms;
 }
 
+.summary-card:nth-child(6) {
+  animation-delay: 200ms;
+}
+
 .summary-card h2 {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--ink-muted);
 }
 
 .summary-card p {
   margin: 0.42rem 0 0;
   font-family: "Orbitron", "Segoe UI", sans-serif;
-  font-size: clamp(1.02rem, 2vw, 1.34rem);
-  letter-spacing: 0.03em;
+  font-size: clamp(0.94rem, 1.6vw, 1.18rem);
+  letter-spacing: 0.02em;
 }
 
 .content-grid {

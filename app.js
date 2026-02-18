@@ -13,12 +13,14 @@ const API_AUTOBOT_RUNTIME_SYNC_URL = "/api/autobot/runtime/sync";
 const API_AUTOBOT_RUNTIME_RUN_URL = "/api/autobot/runtime/run";
 const API_ACCOUNT_SNAPSHOT_URL = "/api/account/snapshot";
 const API_TRADES_URL = "/api/trades";
+const API_OPENAI_DAILY_COST_URL = "/api/openai/costs/daily";
 const DEFAULT_CHART_SCALE = "mins";
 const MAX_TRACKED_SYMBOLS = 20;
 const SEARCH_DEBOUNCE_MS = 250;
 const BACKEND_SYNC_INTERVAL_MS = 20000;
 const BACKEND_SYNC_MIN_GAP_MS = 4000;
 const BROKER_SNAPSHOT_REFRESH_MS = 3 * 60 * 1000;
+const AI_SPEND_REFRESH_MS = 5 * 60 * 1000;
 const MARKET_PAGE_SIZE = 10;
 const COMPANY_INFO_RETRY_MS = 15000;
 const COMPANY_INFO_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -31,12 +33,27 @@ const AI_RESEARCH_TTL_MS_BY_HORIZON = {
 };
 const MAX_AI_CACHE_ENTRIES = 300;
 const MAX_COMPANY_CACHE_ENTRIES = 200;
-const AI_PROVIDERS = ["openai"];
-const AI_MODELS = ["gpt-4.1-mini", "gpt-4o-mini", "gpt-5-mini", "gpt-5-mini-2025-08-07"];
+const AI_RESEARCH_MODELS_BY_PROVIDER = {
+  openai: ["gpt-4.1-mini", "gpt-4o-mini", "gpt-5-mini", "gpt-5-mini-2025-08-07"],
+  deepseek: ["deepseek-chat", "deepseek-reasoner"],
+};
+const AI_AUTOBOT_MODELS_BY_PROVIDER = {
+  openai: ["gpt-4.1-mini", "gpt-4o-mini", "gpt-5-mini", "gpt-5-mini-2025-08-07", "gpt-5.2-2025-12-11"],
+  deepseek: ["deepseek-chat", "deepseek-reasoner"],
+};
+const AI_PROVIDERS = Object.keys(AI_RESEARCH_MODELS_BY_PROVIDER);
+const AI_MODELS = Array.from(
+  new Set(
+    Object.values(AI_RESEARCH_MODELS_BY_PROVIDER)
+      .concat(Object.values(AI_AUTOBOT_MODELS_BY_PROVIDER))
+      .flat()
+  )
+);
 const AI_HORIZONS = ["short", "swing", "long"];
 const DEFAULT_AI_SETTINGS = {
   provider: "openai",
-  model: "gpt-4.1-mini",
+  researchModel: "gpt-4.1-mini",
+  autobotModel: "gpt-4.1-mini",
   horizon: "swing",
   aiResearchAutoRefreshEnabled: true,
   aiResearchAutoRefreshMins: 60,
@@ -212,6 +229,7 @@ const els = {
   closeSettingsBtn: document.getElementById("closeSettingsBtn"),
   aiProviderSelect: document.getElementById("aiProviderSelect"),
   aiModelSelect: document.getElementById("aiModelSelect"),
+  aiAutobotModelSelect: document.getElementById("aiAutobotModelSelect"),
   aiHorizonSelect: document.getElementById("aiHorizonSelect"),
   aiResearchAutoRefreshEnabledInput: document.getElementById("aiResearchAutoRefreshEnabledInput"),
   aiResearchAutoRefreshMinsInput: document.getElementById("aiResearchAutoRefreshMinsInput"),
@@ -238,6 +256,7 @@ const els = {
   equityValue: document.getElementById("equityValue"),
   unrealizedValue: document.getElementById("unrealizedValue"),
   realizedValue: document.getElementById("realizedValue"),
+  aiSpendValue: document.getElementById("aiSpendValue"),
   marketSourceStatus: document.getElementById("marketSourceStatus"),
   chartTitle: document.getElementById("chartTitle"),
   chartStatus: document.getElementById("chartStatus"),
@@ -297,6 +316,8 @@ let backendRuntimeHeartbeatAt = 0;
 let backendRuntimeNextRunAt = 0;
 let brokerTradingAvailable = false;
 let isSubmittingBrokerTrade = false;
+let aiSpendRefreshTimerId = 0;
+let isAiSpendRefreshing = false;
 
 initializeApp();
 
@@ -324,6 +345,14 @@ async function initializeApp() {
     await refreshBrokerAccountSnapshot({ silent: true });
   }
   await syncStateToBackendRuntime({ force: true });
+  await refreshDailyAiSpend({ silent: true });
+  if (aiSpendRefreshTimerId) {
+    window.clearInterval(aiSpendRefreshTimerId);
+    aiSpendRefreshTimerId = 0;
+  }
+  aiSpendRefreshTimerId = window.setInterval(() => {
+    void refreshDailyAiSpend({ silent: true });
+  }, AI_SPEND_REFRESH_MS);
   await refreshPrices();
   await refreshCandlesForSelectedSymbol(true);
   window.setInterval(() => {
@@ -350,6 +379,7 @@ function bindEvents() {
   els.resetWalletBtn.addEventListener("click", resetWallet);
   els.aiProviderSelect.addEventListener("change", onAiSettingsChange);
   els.aiModelSelect.addEventListener("change", onAiSettingsChange);
+  els.aiAutobotModelSelect.addEventListener("change", onAiSettingsChange);
   els.aiHorizonSelect.addEventListener("change", onAiSettingsChange);
   els.aiResearchAutoRefreshEnabledInput.addEventListener("change", onAiSettingsChange);
   els.aiResearchAutoRefreshMinsInput.addEventListener("input", onAiSettingsChange);
@@ -467,6 +497,7 @@ function syncAiSettingsControls() {
   if (
     !els.aiProviderSelect ||
     !els.aiModelSelect ||
+    !els.aiAutobotModelSelect ||
     !els.aiHorizonSelect ||
     !els.aiResearchAutoRefreshEnabledInput ||
     !els.aiResearchAutoRefreshMinsInput ||
@@ -482,7 +513,7 @@ function syncAiSettingsControls() {
   }
   const settings = getAiSettings();
   els.aiProviderSelect.value = settings.provider;
-  els.aiModelSelect.value = settings.model;
+  syncAiModelOptions(settings.provider, settings.researchModel, settings.autobotModel);
   els.aiHorizonSelect.value = settings.horizon;
   els.aiResearchAutoRefreshEnabledInput.checked = Boolean(settings.aiResearchAutoRefreshEnabled);
   els.aiResearchAutoRefreshMinsInput.value = String(settings.aiResearchAutoRefreshMins);
@@ -500,7 +531,9 @@ function syncAiSettingsControls() {
 
 function onAiSettingsChange() {
   const provider = normalizeAiProvider(els.aiProviderSelect.value);
-  const model = normalizeAiModel(els.aiModelSelect.value);
+  syncAiModelOptions(provider, els.aiModelSelect.value, els.aiAutobotModelSelect.value);
+  const researchModel = normalizeAiModel(els.aiModelSelect.value, provider, "research");
+  const autobotModel = normalizeAiModel(els.aiAutobotModelSelect.value, provider, "autobot");
   const horizon = normalizeAiHorizon(els.aiHorizonSelect.value);
   const aiResearchAutoRefreshEnabled = Boolean(els.aiResearchAutoRefreshEnabledInput.checked);
   const aiResearchAutoRefreshMins = normalizeThreshold(
@@ -553,7 +586,8 @@ function onAiSettingsChange() {
   );
   state.aiSettings = {
     provider,
-    model,
+    researchModel,
+    autobotModel,
     horizon,
     aiResearchAutoRefreshEnabled,
     aiResearchAutoRefreshMins,
@@ -574,6 +608,33 @@ function onAiSettingsChange() {
   restartAutobotScheduler();
   persistAndRender();
   void syncStateToBackendRuntime({ force: true });
+}
+
+function syncAiModelOptions(provider, preferredResearchModel, preferredAutobotModel) {
+  if (!els.aiModelSelect || !els.aiAutobotModelSelect) return;
+  const normalizedProvider = normalizeAiProvider(provider);
+  const researchModels = getAiModelsForProvider(normalizedProvider, "research");
+  const autobotModels = getAiModelsForProvider(normalizedProvider, "autobot");
+  const researchOptionsMarkup = researchModels
+    .map((model) => `<option value="${model}">${model}</option>`)
+    .join("");
+  const autobotOptionsMarkup = autobotModels
+    .map((model) => `<option value="${model}">${model}</option>`)
+    .join("");
+  const normalizedResearchModel = normalizeAiModel(
+    preferredResearchModel,
+    normalizedProvider,
+    "research"
+  );
+  const normalizedAutobotModel = normalizeAiModel(
+    preferredAutobotModel,
+    normalizedProvider,
+    "autobot"
+  );
+  els.aiModelSelect.innerHTML = researchOptionsMarkup;
+  els.aiAutobotModelSelect.innerHTML = autobotOptionsMarkup;
+  els.aiModelSelect.value = normalizedResearchModel;
+  els.aiAutobotModelSelect.value = normalizedAutobotModel;
 }
 
 function renderAiThresholdValues(settings) {
@@ -835,7 +896,9 @@ function buildBackendRuntimeSyncPayload() {
     clientRuntimeUpdatedAt: Number(state.backendRuntimeUpdatedAt || 0),
     aiSettings: {
       provider: settings.provider,
-      model: settings.model,
+      researchModel: settings.researchModel,
+      autobotModel: settings.autobotModel,
+      model: settings.researchModel,
       horizon: settings.horizon,
       autobotIntervalMins: settings.autobotIntervalMins,
       maxTradesPerCycle: settings.maxTradesPerCycle,
@@ -905,6 +968,54 @@ async function refreshServerCapabilities() {
   } catch {
     brokerTradingAvailable = false;
     return false;
+  }
+}
+
+async function refreshDailyAiSpend(options = {}) {
+  const silent = Boolean(options?.silent);
+  if (isAiSpendRefreshing) return false;
+  isAiSpendRefreshing = true;
+  try {
+    const response = await fetch(API_OPENAI_DAILY_COST_URL, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    if (!response.ok) {
+      let details = "";
+      try {
+        const body = await response.json();
+        details = typeof body?.error === "string" ? body.error : "";
+      } catch {
+        details = "";
+      }
+      throw new Error(details || `Daily spend request failed (${response.status}).`);
+    }
+
+    const payload = await response.json();
+    state.aiSpend = normalizeAiSpendState({
+      amount: Number(payload?.amount),
+      currency: String(payload?.currency || "USD"),
+      fetchedAt: Date.now(),
+      status: "ok",
+      error: "",
+    });
+    persistAndRender();
+    return true;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    state.aiSpend = normalizeAiSpendState({
+      ...(state.aiSpend || {}),
+      status: "error",
+      error: message,
+    });
+    if (!silent) {
+      setTradeMessage(`AI spend unavailable: ${message}`, "down");
+    }
+    persistAndRender();
+    return false;
+  } finally {
+    isAiSpendRefreshing = false;
   }
 }
 
@@ -1310,8 +1421,9 @@ async function fetchAutobotRecommendation(settings, context) {
     },
     body: JSON.stringify({
       provider: settings.provider,
-      model: settings.model,
+      model: settings.autobotModel,
       horizon: settings.horizon,
+      maxTradesPerCycle: settings.maxTradesPerCycle,
       context,
     }),
   });
@@ -2331,12 +2443,26 @@ function renderSummary() {
   const portfolio = calcPortfolioValue();
   const unrealized = calcUnrealizedPnl();
   const equity = round2(state.cash + portfolio);
+  const aiSpend = normalizeAiSpendState(state.aiSpend);
+  state.aiSpend = aiSpend;
 
   els.cashValue.textContent = fmtMoney(state.cash);
   els.portfolioValue.textContent = fmtMoney(portfolio);
   els.equityValue.textContent = fmtMoney(equity);
   els.unrealizedValue.textContent = fmtMoney(unrealized);
   els.realizedValue.textContent = fmtMoney(state.realizedPnl);
+  if (els.aiSpendValue) {
+    if (aiSpend.status === "ok" && Number.isFinite(aiSpend.amount) && aiSpend.amount >= 0) {
+      els.aiSpendValue.textContent = fmtMoneyWithCurrency(aiSpend.amount, aiSpend.currency || "USD");
+      els.aiSpendValue.title = aiSpend.fetchedAt > 0 ? `Updated ${stampDateTime(aiSpend.fetchedAt)}` : "";
+    } else if (aiSpend.status === "error") {
+      els.aiSpendValue.textContent = "N/A";
+      els.aiSpendValue.title = aiSpend.error || "Daily spend unavailable.";
+    } else {
+      els.aiSpendValue.textContent = "--";
+      els.aiSpendValue.title = "Daily spend not loaded.";
+    }
+  }
 
   applyPnLClass(els.unrealizedValue, unrealized);
   applyPnLClass(els.realizedValue, state.realizedPnl);
@@ -2460,6 +2586,9 @@ function renderAiPanel() {
   const aiLoadStatus = aiResearchLoadStatusByKey[aiCacheKey] || "";
   const aiError = aiResearchErrorByKey[aiCacheKey] || "";
   const isStale = researchEntry ? isAiResearchEntryStale(researchEntry) : false;
+  const isCurrentSettingsEntry = researchEntry
+    ? isAiResearchEntryForSettings(researchEntry, settings)
+    : false;
   const titleText = company?.name
     ? `Watchlist Research: ${symbol} | ${company.name}`
     : `Watchlist Research: ${symbol}`;
@@ -2493,13 +2622,16 @@ function renderAiPanel() {
 
   currentAiRecommendation = recommendation;
   if (aiLoadStatus === "loading") {
-    els.aiStatus.textContent = "Updating OpenAI research...";
+    els.aiStatus.textContent = `Updating ${formatAiProviderLabel(settings.provider)} research...`;
   } else if (aiError) {
     els.aiStatus.textContent = `AI research error: ${aiError}`;
   } else if (researchEntry) {
-    els.aiStatus.textContent = `OpenAI ${settings.model} | ${settings.horizon} horizon | Updated ${stampDateTime(
+    const carryOverSuffix = isCurrentSettingsEntry ? "" : " (from previous model settings)";
+    els.aiStatus.textContent = `${formatAiProviderLabel(researchEntry.provider)} ${researchEntry.model} | ${
+      researchEntry.horizon
+    } horizon | Updated ${stampDateTime(
       researchEntry.fetchedAt
-    )}${isStale ? " (stale)" : ""}`;
+    )}${isStale ? " (stale)" : ""}${carryOverSuffix}`;
   } else if (companyError) {
     els.aiStatus.textContent = `Company profile error: ${companyError}`;
   } else {
@@ -2702,7 +2834,7 @@ async function fetchAiResearchForSymbol(symbol, settings, quote, company) {
     body: JSON.stringify({
       symbol,
       provider: settings.provider,
-      model: settings.model,
+      model: settings.researchModel,
       horizon: settings.horizon,
       quote: quote
         ? {
@@ -3158,7 +3290,7 @@ function buildAiResearchText(symbol, quote, researchEntry) {
     `${symbol} placeholder AI snapshot`,
     `Current price: ${price} | Prior close: ${lastClose}`,
     "",
-    "No cached OpenAI research for the current settings yet.",
+    "No cached AI research for the current settings yet.",
     "Click Update to fetch sentiment and an AI brief.",
     "",
     `Selected horizon: ${getAiSettings().horizon}`,
@@ -3573,9 +3705,36 @@ function normalizeAiProvider(raw) {
   return AI_PROVIDERS.includes(value) ? value : DEFAULT_AI_SETTINGS.provider;
 }
 
-function normalizeAiModel(raw) {
+function getAiModelsForProvider(provider, target) {
+  const normalizedProvider = normalizeAiProvider(provider);
+  const source =
+    target === "autobot"
+      ? AI_AUTOBOT_MODELS_BY_PROVIDER
+      : AI_RESEARCH_MODELS_BY_PROVIDER;
+  const fallbackSource =
+    target === "autobot"
+      ? AI_AUTOBOT_MODELS_BY_PROVIDER[DEFAULT_AI_SETTINGS.provider]
+      : AI_RESEARCH_MODELS_BY_PROVIDER[DEFAULT_AI_SETTINGS.provider];
+  if (Array.isArray(source[normalizedProvider]) && source[normalizedProvider].length > 0) {
+    return source[normalizedProvider];
+  }
+  return Array.isArray(fallbackSource) ? fallbackSource : [];
+}
+
+function getAiDefaultModelForProvider(provider, target) {
+  const models = getAiModelsForProvider(provider, target);
+  if (models.length > 0) return models[0];
+  return DEFAULT_AI_SETTINGS.researchModel;
+}
+
+function normalizeAiModel(raw, provider, target) {
+  const normalizedProvider = normalizeAiProvider(provider);
+  const allowedModels = getAiModelsForProvider(normalizedProvider, target);
+  const fallbackModel = getAiDefaultModelForProvider(normalizedProvider, target);
   const value = String(raw || "").trim();
-  return AI_MODELS.includes(value) ? value : DEFAULT_AI_SETTINGS.model;
+  if (allowedModels.includes(value)) return value;
+  if (target !== "research" && AI_MODELS.includes(value)) return value;
+  return fallbackModel;
 }
 
 function normalizeAiHorizon(raw) {
@@ -3585,9 +3744,23 @@ function normalizeAiHorizon(raw) {
 
 function normalizeAiSettings(input) {
   const safe = input && typeof input === "object" ? input : {};
+  const provider = normalizeAiProvider(safe.provider);
+  const fallbackModel = normalizeAiModel(safe.model, provider, "research");
+  const researchModel = normalizeAiModel(
+    safe.researchModel !== undefined ? safe.researchModel : fallbackModel,
+    provider,
+    "research"
+  );
+  const autobotModel = normalizeAiModel(
+    safe.autobotModel !== undefined ? safe.autobotModel : fallbackModel,
+    provider,
+    "autobot"
+  );
   return {
-    provider: normalizeAiProvider(safe.provider),
-    model: normalizeAiModel(safe.model),
+    provider,
+    researchModel,
+    autobotModel,
+    model: researchModel,
     horizon: normalizeAiHorizon(safe.horizon),
     aiResearchAutoRefreshEnabled:
       typeof safe.aiResearchAutoRefreshEnabled === "boolean"
@@ -3755,7 +3928,21 @@ function normalizeAutobotRecommendation(input) {
 function buildAiCacheKey(symbol, settings) {
   const normalizedSymbol = normalizeSymbolInput(symbol);
   const safeSettings = normalizeAiSettings(settings);
-  return `${normalizedSymbol}|${safeSettings.provider}|${safeSettings.model}|${safeSettings.horizon}`;
+  return `${normalizedSymbol}|${safeSettings.provider}|${safeSettings.researchModel}|${safeSettings.horizon}`;
+}
+
+function formatAiProviderLabel(provider) {
+  return normalizeAiProvider(provider) === "deepseek" ? "DeepSeek" : "OpenAI";
+}
+
+function isAiResearchEntryForSettings(entry, settings) {
+  if (!entry || typeof entry !== "object") return false;
+  const safeSettings = normalizeAiSettings(settings);
+  return (
+    normalizeAiProvider(entry.provider) === safeSettings.provider &&
+    normalizeAiModel(entry.model, entry.provider, "research") === safeSettings.researchModel &&
+    normalizeAiHorizon(entry.horizon) === safeSettings.horizon
+  );
 }
 
 function getAiResearchNextDueAt(symbol, settings) {
@@ -3773,18 +3960,49 @@ function getAiResearchNextDueAt(symbol, settings) {
 function getAiResearchEntry(symbol, settings) {
   const normalizedSymbol = normalizeSymbolInput(symbol);
   if (!normalizedSymbol) return null;
-  const key = buildAiCacheKey(normalizedSymbol, settings);
-  const entry = state.aiResearchCache && typeof state.aiResearchCache === "object"
-    ? state.aiResearchCache[key]
+  const safeSettings = normalizeAiSettings(settings);
+  const cache = state.aiResearchCache && typeof state.aiResearchCache === "object"
+    ? state.aiResearchCache
     : null;
+  if (!cache) return null;
+  const key = buildAiCacheKey(normalizedSymbol, safeSettings);
+  const exactEntry = parseAiResearchCacheEntry(cache[key], normalizedSymbol);
+  if (exactEntry) return exactEntry;
+
+  return findLatestAiResearchEntryForSymbol(normalizedSymbol, safeSettings, cache);
+}
+
+function findLatestAiResearchEntryForSymbol(symbol, settings, cache) {
+  const normalizedSymbol = normalizeSymbolInput(symbol);
+  if (!normalizedSymbol || !cache || typeof cache !== "object") return null;
+  const targetHorizon = normalizeAiHorizon(settings?.horizon);
+  let latestSameHorizon = null;
+
+  for (const rawEntry of Object.values(cache)) {
+    const parsed = parseAiResearchCacheEntry(rawEntry, normalizedSymbol);
+    if (!parsed || parsed.symbol !== normalizedSymbol) continue;
+
+    if (parsed.horizon === targetHorizon) {
+      if (!latestSameHorizon || parsed.fetchedAt > latestSameHorizon.fetchedAt) {
+        latestSameHorizon = parsed;
+      }
+    }
+  }
+
+  return latestSameHorizon;
+}
+
+function parseAiResearchCacheEntry(entry, fallbackSymbol) {
   if (!entry || typeof entry !== "object") return null;
+  const symbol = normalizeSymbolInput(entry.symbol) || normalizeSymbolInput(fallbackSymbol);
+  if (!symbol) return null;
   const fetchedAt = Number(entry.fetchedAt);
   if (!Number.isFinite(fetchedAt) || fetchedAt <= 0) return null;
 
   return {
-    symbol: normalizeSymbolInput(entry.symbol) || normalizedSymbol,
+    symbol,
     provider: normalizeAiProvider(entry.provider),
-    model: normalizeAiModel(entry.model),
+    model: normalizeAiModel(entry.model, entry.provider, "research"),
     horizon: normalizeAiHorizon(entry.horizon),
     fetchedAt,
     profile: normalizeIncomingAiProfile(entry.profile),
@@ -3813,7 +4031,7 @@ function upsertAiResearchEntry(symbol, settings, profile) {
   state.aiResearchCache[key] = {
     symbol: normalizedSymbol,
     provider: safeSettings.provider,
-    model: safeSettings.model,
+    model: safeSettings.researchModel,
     horizon: safeSettings.horizon,
     fetchedAt,
     profile: normalizeIncomingAiProfile(profile),
@@ -3830,7 +4048,7 @@ function normalizeAiResearchCache(input) {
     const symbol = normalizeSymbolInput(value.symbol);
     if (!symbol) continue;
     const provider = normalizeAiProvider(value.provider);
-    const model = normalizeAiModel(value.model);
+    const model = normalizeAiModel(value.model, provider, "research");
     const horizon = normalizeAiHorizon(value.horizon);
     const fetchedAt = Number(value.fetchedAt);
     if (!Number.isFinite(fetchedAt) || fetchedAt <= 0) continue;
@@ -4135,6 +4353,25 @@ function normalizePendingOrders(input) {
     .slice(0, 100);
 }
 
+function normalizeAiSpendState(input) {
+  const safe = input && typeof input === "object" ? input : {};
+  const amountRaw = Number(safe.amount);
+  const amount = Number.isFinite(amountRaw) && amountRaw >= 0 ? round2(amountRaw) : null;
+  const fetchedAtRaw = Number(safe.fetchedAt);
+  const fetchedAt = Number.isFinite(fetchedAtRaw) && fetchedAtRaw > 0 ? Math.floor(fetchedAtRaw) : 0;
+  const statusRaw = String(safe.status || "").trim().toLowerCase();
+  const status = statusRaw === "ok" || statusRaw === "error" ? statusRaw : "idle";
+  const currency = String(safe.currency || "USD").trim().toUpperCase() || "USD";
+  const error = truncateText(safe.error || "", 220);
+  return {
+    amount,
+    currency,
+    fetchedAt,
+    status,
+    error,
+  };
+}
+
 function normalizeLockedWatchlistSymbols(input, watchlist) {
   const watchSet = new Set(
     (Array.isArray(watchlist) ? watchlist : [])
@@ -4223,6 +4460,7 @@ function normalizeState(input) {
   const marketScout = normalizeMarketScoutState(safe.marketScout);
   const autobot = normalizeAutobotState(safe.autobot);
   const pendingOrders = normalizePendingOrders(safe.pendingOrders || safe.openOrders);
+  const aiSpend = normalizeAiSpendState(safe.aiSpend);
 
   return {
     cash:
@@ -4258,6 +4496,7 @@ function normalizeState(input) {
     aiResearchCache,
     companyCache,
     aiRefreshMeta,
+    aiSpend,
     marketScout,
     autobot,
   };
@@ -4299,6 +4538,7 @@ function createInitialState() {
     aiResearchCache: {},
     companyCache: {},
     aiRefreshMeta: normalizeAiRefreshMeta({}, watchlist),
+    aiSpend: normalizeAiSpendState({ status: "idle" }),
     marketScout: { ...DEFAULT_MARKET_SCOUT_STATE },
     autobot: { ...DEFAULT_AUTOBOT_STATE },
   };
@@ -4319,6 +4559,20 @@ function fmtMoney(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function fmtMoneyWithCurrency(value, currency) {
+  const safeCurrency = String(currency || "USD").trim().toUpperCase() || "USD";
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: safeCurrency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(value) || 0);
+  } catch {
+    return fmtMoney(Number(value) || 0);
+  }
 }
 
 function signedMoney(value) {

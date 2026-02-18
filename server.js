@@ -20,6 +20,16 @@ const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || "";
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com/v1";
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+const DEEPSEEK_DEFAULT_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
+const OPENAI_USAGE_API_KEY =
+  process.env.OPENAI_USAGE_API_KEY ||
+  process.env.OPENAI_ADMIN_KEY ||
+  process.env.OPENAI_API_KEY ||
+  "";
+const OPENAI_ORG_ID = process.env.OPENAI_ORG_ID || process.env.OPENAI_ORGANIZATION || "";
+const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || "";
 
 const DEFAULT_SYMBOLS = ["AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "TSLA", "AMD"];
 const MAX_WATCHLIST_SYMBOLS = 20;
@@ -28,7 +38,7 @@ const MARKET_SCOUT_MAX_RECENT_MESSAGES = 40;
 const MARKET_SCOUT_HOT_REFRESH_MINS = 180;
 const MARKET_SCOUT_HOT_NEWS_LOOKBACK_DAYS = 1;
 const MARKET_SCOUT_MAX_HOT_SYMBOLS = 30;
-const RESEARCH_NEWS_LOOKBACK_DAYS = 3;
+const RESEARCH_NEWS_LOOKBACK_DAYS = 1;
 const MARKET_SCOUT_UNIVERSE_SYMBOLS = [
   "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "TSLA", "AMD", "AVGO", "BRK.B", "JPM", "JNJ",
   "V", "XOM", "UNH", "PG", "HD", "MA", "COST", "ABBV", "NFLX", "BAC", "KO", "PEP", "MRK", "CSCO",
@@ -43,6 +53,7 @@ const MARKET_SCOUT_UNIVERSE_SYMBOLS = [
 const ASSET_SEARCH_LIMIT_MAX = 25;
 const ASSET_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const COMPANY_PROFILE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const OPENAI_DAILY_COST_CACHE_TTL_MS = 5 * 60 * 1000;
 const RUNTIME_STATE_FILE = path.join(ROOT_DIR, "data", "autobot-runtime.json");
 const RUNTIME_TICK_MS = 15000;
 const ALPACA_CLOCK_CACHE_TTL_MS = 30 * 1000;
@@ -55,6 +66,11 @@ let cachedAssetUniverse = {
 let cachedAlpacaClock = {
   fetchedAt: 0,
   clock: null,
+};
+let cachedOpenAiDailyCost = {
+  fetchedAt: 0,
+  dayStartUnix: 0,
+  payload: null,
 };
 const companyProfileCache = new Map();
 let runtimeState = loadRuntimeStateFromDisk();
@@ -83,6 +99,7 @@ const server = http.createServer(async (req, res) => {
         ok: true,
         alpacaConfigured: Boolean(ALPACA_KEY_ID && ALPACA_SECRET_KEY),
         openAiConfigured: Boolean(OPENAI_API_KEY),
+        deepseekConfigured: Boolean(DEEPSEEK_API_KEY),
         feed: ALPACA_FEED,
         date: new Date().toISOString(),
       });
@@ -109,6 +126,28 @@ const server = http.createServer(async (req, res) => {
       } catch (error) {
         return json(res, 502, {
           error: error instanceof Error ? error.message : "Unable to fetch quotes from Alpaca.",
+        });
+      }
+    }
+
+    if (method === "GET" && pathname === "/api/openai/costs/daily") {
+      if (!OPENAI_USAGE_API_KEY) {
+        return json(res, 503, {
+          error:
+            "OpenAI usage key is not configured. Set OPENAI_USAGE_API_KEY (or OPENAI_ADMIN_KEY) in your .env file.",
+        });
+      }
+      try {
+        const cost = await fetchOpenAiDailyCostUsd();
+        return json(res, 200, {
+          source: "openai-organization-costs",
+          asOf: new Date().toISOString(),
+          ...cost,
+        });
+      } catch (error) {
+        return json(res, 502, {
+          error:
+            error instanceof Error ? error.message : "Unable to fetch daily OpenAI costs.",
         });
       }
     }
@@ -315,12 +354,6 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === "POST" && pathname === "/api/ai/research") {
-      if (!OPENAI_API_KEY) {
-        return json(res, 503, {
-          error: "OpenAI key is not configured. Set OPENAI_API_KEY in your .env file.",
-        });
-      }
-
       let requestBody;
       try {
         requestBody = await readJsonBody(req);
@@ -342,16 +375,17 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      const provider = String(requestBody.provider || "openai")
-        .trim()
-        .toLowerCase();
-      if (provider !== "openai") {
-        return json(res, 400, {
-          error: "Only provider `openai` is currently supported.",
+      const provider = parseAiProvider(requestBody.provider, "openai");
+      if (!hasAiProviderKey(provider)) {
+        return json(res, 503, {
+          error:
+            provider === "deepseek"
+              ? "DeepSeek key is not configured. Set DEEPSEEK_API_KEY in your .env file."
+              : "OpenAI key is not configured. Set OPENAI_API_KEY in your .env file.",
         });
       }
 
-      const model = parseAiModel(requestBody.model, OPENAI_DEFAULT_MODEL);
+      const model = parseAiModel(requestBody.model, getDefaultModelForProvider(provider));
       const horizon = parseAiHorizon(requestBody.horizon);
       const quote = normalizeAiQuoteInput(requestBody.quote);
       const company = normalizeAiCompanyInput(requestBody.company);
@@ -360,6 +394,7 @@ const server = http.createServer(async (req, res) => {
 
       try {
         const research = await fetchOpenAiResearch({
+          provider,
           symbol,
           model,
           horizon,
@@ -370,7 +405,7 @@ const server = http.createServer(async (req, res) => {
         });
 
         return json(res, 200, {
-          source: "openai-chat-completions",
+          source: provider === "deepseek" ? "deepseek-chat-completions" : "openai-chat-completions",
           asOf: new Date().toISOString(),
           symbol,
           provider,
@@ -387,12 +422,6 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === "POST" && pathname === "/api/ai/autobot") {
-      if (!OPENAI_API_KEY) {
-        return json(res, 503, {
-          error: "OpenAI key is not configured. Set OPENAI_API_KEY in your .env file.",
-        });
-      }
-
       let requestBody;
       try {
         requestBody = await readJsonBody(req);
@@ -408,16 +437,17 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      const provider = String(requestBody.provider || "openai")
-        .trim()
-        .toLowerCase();
-      if (provider !== "openai") {
-        return json(res, 400, {
-          error: "Only provider `openai` is currently supported.",
+      const provider = parseAiProvider(requestBody.provider, "openai");
+      if (!hasAiProviderKey(provider)) {
+        return json(res, 503, {
+          error:
+            provider === "deepseek"
+              ? "DeepSeek key is not configured. Set DEEPSEEK_API_KEY in your .env file."
+              : "OpenAI key is not configured. Set OPENAI_API_KEY in your .env file.",
         });
       }
 
-      const model = parseAiModel(requestBody.model, OPENAI_DEFAULT_MODEL);
+      const model = parseAiModel(requestBody.model, getDefaultModelForProvider(provider));
       const horizon = parseAiHorizon(requestBody.horizon);
       const maxActions = clampInteger(
         requestBody.maxTradesPerCycle,
@@ -434,6 +464,7 @@ const server = http.createServer(async (req, res) => {
 
       try {
         const plan = await fetchOpenAiAutobotRecommendation({
+          provider,
           model,
           horizon,
           context,
@@ -456,7 +487,7 @@ const server = http.createServer(async (req, res) => {
           );
 
         return json(res, 200, {
-          source: "openai-autobot",
+          source: provider === "deepseek" ? "deepseek-autobot" : "openai-autobot",
           asOf: new Date().toISOString(),
           provider,
           model,
@@ -1319,6 +1350,8 @@ function createInitialRuntimeState() {
     lastClientHeartbeatAt: 0,
     aiSettings: {
       provider: "openai",
+      researchModel: OPENAI_DEFAULT_MODEL,
+      autobotModel: OPENAI_DEFAULT_MODEL,
       model: OPENAI_DEFAULT_MODEL,
       horizon: "swing",
       autobotIntervalMins: 30,
@@ -1729,6 +1762,43 @@ async function runRuntimeCycle(source) {
       await refreshRuntimeResearchIfDue(state);
     }
 
+    if (!hasAiProviderKey(state.aiSettings.provider)) {
+      const providerLabel = state.aiSettings.provider === "deepseek" ? "DeepSeek" : "OpenAI";
+      const holdReason = `${providerLabel} key unavailable, skipping auto trade.`;
+      state.autobot = normalizeRuntimeAutobotState({
+        ...state.autobot,
+        lastRunAt: now,
+        latestThought: holdReason,
+        latestRecommendation: {
+          action: "HOLD",
+          side: "hold",
+          symbol: "",
+          shares: 0,
+          reason: holdReason,
+          thought: holdReason,
+        },
+        latestAutoAction: {
+          type: "HOLD",
+          symbol: "",
+          shares: 0,
+          reason: holdReason,
+          executed: false,
+          at: now,
+        },
+        lastStatus: `Auto hold (${providerLabel} key unavailable)`,
+        lastError: "",
+      });
+      state.updatedAt = Date.now();
+      runtimeState = state;
+      await persistRuntimeStateToDisk(runtimeState);
+      return {
+        ran: true,
+        status: state.autobot.lastStatus,
+        recommendation: state.autobot.latestRecommendation,
+        latestAutoAction: state.autobot.latestAutoAction,
+      };
+    }
+
     const context = buildRuntimeAutobotContext(state);
     const maxActions = clampInteger(
       state.aiSettings.maxTradesPerCycle,
@@ -1737,7 +1807,8 @@ async function runRuntimeCycle(source) {
       DEFAULT_AUTO_TRADE_ACTIONS_PER_CYCLE
     );
     const plan = await fetchOpenAiAutobotRecommendation({
-      model: state.aiSettings.model,
+      provider: state.aiSettings.provider,
+      model: state.aiSettings.autobotModel,
       horizon: state.aiSettings.horizon,
       context,
       maxActions,
@@ -1939,8 +2010,8 @@ async function runRuntimeMarketScoutTick() {
 
   if (!quote) {
     message = `Researched ${symbol}, no live quote, no action.`;
-  } else if (!OPENAI_API_KEY) {
-    message = `Researched ${symbol}, AI key unavailable, no action.`;
+  } else if (!hasAiProviderKey(settings.provider)) {
+    message = `Researched ${symbol}, ${settings.provider === "deepseek" ? "DeepSeek" : "OpenAI"} key unavailable, no action.`;
   } else {
     try {
       let company = getCachedCompanyProfile(symbol);
@@ -1954,8 +2025,9 @@ async function runRuntimeMarketScoutTick() {
       }
 
       const research = await fetchOpenAiResearch({
+        provider: settings.provider,
         symbol,
-        model: settings.model,
+        model: settings.researchModel,
         horizon: settings.horizon,
         quote,
         company,
@@ -1975,7 +2047,7 @@ async function runRuntimeMarketScoutTick() {
       state.aiResearchCache[key] = {
         symbol,
         provider: settings.provider,
-        model: settings.model,
+        model: settings.researchModel,
         horizon: settings.horizon,
         fetchedAt,
         profile: research,
@@ -2042,7 +2114,7 @@ async function refreshRuntimeQuotes(state) {
 }
 
 async function refreshRuntimeResearchIfDue(state) {
-  if (!OPENAI_API_KEY) return;
+  if (!hasAiProviderKey(state.aiSettings?.provider)) return;
   const settings = state.aiSettings;
   const symbol = getNextDueRuntimeResearchSymbol(state, settings);
   if (!symbol) return;
@@ -2071,8 +2143,9 @@ async function refreshRuntimeResearchIfDue(state) {
   const position = buildRuntimePositionContext(state, symbol);
   const marketContext = buildRuntimeResearchMarketContext(state, symbol, settings);
   const research = await fetchOpenAiResearch({
+    provider: settings.provider,
     symbol,
-    model: settings.model,
+    model: settings.researchModel,
     horizon: settings.horizon,
     quote,
     company,
@@ -2085,7 +2158,7 @@ async function refreshRuntimeResearchIfDue(state) {
   state.aiResearchCache[key] = {
     symbol,
     provider: settings.provider,
-    model: settings.model,
+    model: settings.researchModel,
     horizon: settings.horizon,
     fetchedAt,
     profile: research,
@@ -2331,7 +2404,7 @@ async function refreshRuntimeScoutHotSymbolsIfDue(state, scoutState, now) {
 
   try {
     const hot = await fetchOpenAiHotStockSymbols({
-      model: state.aiSettings?.model || OPENAI_DEFAULT_MODEL,
+      model: OPENAI_DEFAULT_MODEL,
     });
     let hotSymbols = Array.isArray(hot.symbols) ? hot.symbols : [];
 
@@ -2622,8 +2695,11 @@ function getRuntimeResearchEntry(state, symbol, settings) {
   if (!fetchedAt || fetchedAt <= 0) return null;
   return {
     symbol: parseSingleSymbol(entry.symbol) || symbol,
-    provider: String(entry.provider || "openai"),
-    model: parseAiModel(entry.model, settings.model),
+    provider: parseAiProvider(entry.provider, settings.provider),
+    model: parseAiModel(
+      entry.model,
+      parseAiModel(settings.researchModel, getDefaultModelForProvider(settings.provider))
+    ),
     horizon: parseAiHorizon(entry.horizon),
     fetchedAt: Math.floor(fetchedAt),
     profile: normalizeAiResearchResult(entry.profile || {}),
@@ -2632,10 +2708,8 @@ function getRuntimeResearchEntry(state, symbol, settings) {
 
 function buildRuntimeResearchCacheKey(symbol, settings) {
   const cleanSymbol = parseSingleSymbol(symbol);
-  const provider = String(settings?.provider || "openai")
-    .trim()
-    .toLowerCase();
-  const model = parseAiModel(settings?.model, OPENAI_DEFAULT_MODEL);
+  const provider = parseAiProvider(settings?.provider, "openai");
+  const model = parseAiModel(settings?.researchModel, getDefaultModelForProvider(provider));
   const horizon = parseAiHorizon(settings?.horizon);
   return `${cleanSymbol}|${provider}|${model}|${horizon}`;
 }
@@ -2780,16 +2854,22 @@ function normalizeRuntimeState(input) {
 function normalizeRuntimeAiSettings(input, fallback) {
   const safe = input && typeof input === "object" ? input : {};
   const base = fallback && typeof fallback === "object" ? fallback : createInitialRuntimeState().aiSettings;
-  const provider = String(safe.provider || base.provider || "openai")
-    .trim()
-    .toLowerCase();
+  const provider = parseAiProvider(safe.provider, parseAiProvider(base.provider, "openai"));
+  const legacyModel = parseAiModel(
+    safe.model,
+    parseAiModel(base.model, getDefaultModelForProvider(provider))
+  );
+  const researchModel = parseAiModel(safe.researchModel, legacyModel);
+  const autobotModel = parseAiModel(safe.autobotModel, legacyModel);
   const autoEnabled =
     typeof safe.aiResearchAutoRefreshEnabled === "boolean"
       ? safe.aiResearchAutoRefreshEnabled
       : Boolean(base.aiResearchAutoRefreshEnabled);
   return {
-    provider: provider === "openai" ? "openai" : "openai",
-    model: parseAiModel(safe.model, base.model || OPENAI_DEFAULT_MODEL),
+    provider,
+    researchModel,
+    autobotModel,
+    model: researchModel,
     horizon: parseAiHorizon(safe.horizon || base.horizon),
     autobotIntervalMins: clampInteger(safe.autobotIntervalMins, 5, 240, base.autobotIntervalMins || 30),
     maxTradesPerCycle: clampInteger(
@@ -2983,10 +3063,8 @@ function normalizeRuntimeAiResearchCache(input) {
     if (!raw || typeof raw !== "object") continue;
     const symbol = parseSingleSymbol(raw.symbol);
     if (!symbol) continue;
-    const provider = String(raw.provider || "openai")
-      .trim()
-      .toLowerCase();
-    const model = parseAiModel(raw.model, OPENAI_DEFAULT_MODEL);
+    const provider = parseAiProvider(raw.provider, "openai");
+    const model = parseAiModel(raw.model, getDefaultModelForProvider(provider));
     const horizon = parseAiHorizon(raw.horizon);
     const fetchedAt = normalizeTimestamp(raw.fetchedAt, 0);
     if (fetchedAt <= 0) continue;
@@ -2996,7 +3074,7 @@ function normalizeRuntimeAiResearchCache(input) {
       key,
       value: {
         symbol,
-        provider: provider === "openai" ? "openai" : "openai",
+        provider,
         model,
         horizon,
         fetchedAt,
@@ -3088,10 +3166,36 @@ function normalizeTimestamp(raw, fallback) {
   return Math.floor(num);
 }
 
+function parseAiProvider(raw, fallback) {
+  const fallbackProvider =
+    String(fallback || "openai")
+      .trim()
+      .toLowerCase() === "deepseek"
+      ? "deepseek"
+      : "openai";
+  const provider = String(raw || fallbackProvider)
+    .trim()
+    .toLowerCase();
+  if (provider === "openai" || provider === "deepseek") return provider;
+  return fallbackProvider;
+}
+
+function getDefaultModelForProvider(provider) {
+  const cleanProvider = parseAiProvider(provider, "openai");
+  return cleanProvider === "deepseek" ? DEEPSEEK_DEFAULT_MODEL : OPENAI_DEFAULT_MODEL;
+}
+
+function hasAiProviderKey(provider) {
+  const cleanProvider = parseAiProvider(provider, "openai");
+  if (cleanProvider === "deepseek") return Boolean(DEEPSEEK_API_KEY);
+  return Boolean(OPENAI_API_KEY);
+}
+
 function parseAiModel(raw, fallback) {
-  const model = String(raw || fallback || OPENAI_DEFAULT_MODEL).trim();
-  if (!model) return OPENAI_DEFAULT_MODEL;
-  if (!/^[A-Za-z0-9._:-]{1,80}$/.test(model)) return OPENAI_DEFAULT_MODEL;
+  const fallbackModel = String(fallback || OPENAI_DEFAULT_MODEL).trim() || OPENAI_DEFAULT_MODEL;
+  const model = String(raw || fallbackModel).trim();
+  if (!model) return fallbackModel;
+  if (!/^[A-Za-z0-9._:-]{1,80}$/.test(model)) return fallbackModel;
   return model;
 }
 
@@ -3303,7 +3407,40 @@ function normalizeAutobotContextInput(raw) {
   };
 }
 
-async function fetchOpenAiResearch({ symbol, model, horizon, quote, company, marketContext, position }) {
+async function fetchOpenAiResearch({ provider, symbol, model, horizon, quote, company, marketContext, position }) {
+  const aiProvider = parseAiProvider(provider, "openai");
+  if (aiProvider === "deepseek") {
+    const systemPrompt = [
+      "You are a concise equity research assistant.",
+      "Use only the provided input data. Do not assume external facts you cannot verify from input.",
+      "Recommendation must be aware of current holdings context.",
+      "If shares > 0, interpret BUY as add-to-position, HOLD as maintain, SELL as reduce/exit.",
+      "If shares = 0, interpret HOLD as watch/no-entry.",
+      "Return a single JSON object with keys:",
+      "sentiment (-100..100), confidence (0..100), action (BUY|HOLD|SELL), buyCashPct (0..1), trimPositionPct (0..1), thesis, catalyst, risk, brief.",
+      "Keep thesis/catalyst/risk/brief factual and concise and grounded in provided context.",
+      "Do not include markdown or any text outside JSON.",
+    ].join(" ");
+    const userPrompt = [
+      buildOpenAiResearchUserPrompt({
+        symbol,
+        horizon,
+        quote,
+        company,
+        marketContext,
+        position,
+      }),
+      "",
+      "Note: External web search is not available for this provider. Base analysis only on provided context and clearly reflect uncertainty when context is incomplete.",
+    ].join("\n");
+    const parsed = await fetchDeepseekJsonObject({
+      model,
+      systemPrompt,
+      userPrompt,
+    });
+    return normalizeAiResearchResult(parsed);
+  }
+
   const systemPrompt = [
     "You are a concise equity research assistant.",
     "Use the provided input data and live web search results only.",
@@ -3340,7 +3477,8 @@ async function fetchOpenAiResearch({ symbol, model, horizon, quote, company, mar
   return normalizeAiResearchResult(parsed);
 }
 
-async function fetchOpenAiAutobotRecommendation({ model, horizon, context, maxActions }) {
+async function fetchOpenAiAutobotRecommendation({ provider, model, horizon, context, maxActions }) {
+  const aiProvider = parseAiProvider(provider, "openai");
   const cappedMaxActions = clampInteger(
     maxActions,
     1,
@@ -3361,7 +3499,10 @@ async function fetchOpenAiAutobotRecommendation({ model, horizon, context, maxAc
   ].join(" ");
 
   const userPrompt = buildOpenAiAutobotUserPrompt({ horizon, context, maxActions: cappedMaxActions });
-  const parsed = await fetchOpenAiJsonObject({ model, systemPrompt, userPrompt });
+  const parsed =
+    aiProvider === "deepseek"
+      ? await fetchDeepseekJsonObject({ model, systemPrompt, userPrompt })
+      : await fetchOpenAiJsonObject({ model, systemPrompt, userPrompt });
   return normalizeAutobotRecommendationPlanResult(parsed, context, cappedMaxActions);
 }
 
@@ -3471,6 +3612,52 @@ async function fetchOpenAiJsonObject({ model, systemPrompt, userPrompt }) {
   const responsesPayload = await responsesResponse.json();
   const responseText = extractTextFromResponsesPayload(responsesPayload);
   return parseJsonObjectFromModelOutput(responseText);
+}
+
+async function fetchDeepseekJsonObject({ model, systemPrompt, userPrompt }) {
+  const requestWithResponseFormat = async (includeResponseFormat) => {
+    const body = {
+      model: parseAiModel(model, DEEPSEEK_DEFAULT_MODEL),
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    };
+    if (includeResponseFormat) {
+      body.response_format = { type: "json_object" };
+    }
+    return fetch(buildDeepseekUrl("chat/completions"), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  };
+
+  let response = await requestWithResponseFormat(true);
+  if (!response.ok) {
+    const firstBody = await safeReadText(response);
+    const lower = firstBody.toLowerCase();
+    const shouldRetryWithoutResponseFormat =
+      response.status === 400 &&
+      (lower.includes("response_format") || lower.includes("json_object") || lower.includes("unsupported"));
+    if (!shouldRetryWithoutResponseFormat) {
+      throw new Error(`DeepSeek chat/completions failed (${response.status}): ${firstBody.slice(0, 240)}`);
+    }
+    response = await requestWithResponseFormat(false);
+  }
+
+  if (!response.ok) {
+    const body = await safeReadText(response);
+    throw new Error(`DeepSeek chat/completions failed (${response.status}): ${body.slice(0, 240)}`);
+  }
+
+  const payload = await response.json();
+  const messageContent = payload?.choices?.[0]?.message?.content;
+  return parseJsonObjectFromModelOutput(messageContent);
 }
 
 async function fetchOpenAiJsonObjectWithRecentWebSearch({
@@ -3965,6 +4152,104 @@ function buildOpenAiUrl(pathname) {
   const normalizedBase = base.endsWith("/") ? base : `${base}/`;
   const normalizedPath = String(pathname || "").replace(/^\/+/, "");
   return new URL(normalizedPath, normalizedBase);
+}
+
+function buildDeepseekUrl(pathname) {
+  const base = String(DEEPSEEK_BASE_URL || "https://api.deepseek.com/v1").trim();
+  const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+  const normalizedPath = String(pathname || "").replace(/^\/+/, "");
+  return new URL(normalizedPath, normalizedBase);
+}
+
+async function fetchOpenAiDailyCostUsd() {
+  const nowMs = Date.now();
+  const now = new Date(nowMs);
+  const dayStartMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayStartUnix = Math.floor(dayStartMs / 1000);
+  const endTimeUnixRaw = Math.floor(nowMs / 1000);
+  const endTimeUnix = Math.max(dayStartUnix + 1, endTimeUnixRaw);
+
+  if (endTimeUnixRaw <= dayStartUnix) {
+    const output = {
+      startTime: dayStartUnix,
+      endTime: dayStartUnix + 1,
+      amount: 0,
+      currency: "USD",
+    };
+    cachedOpenAiDailyCost = {
+      fetchedAt: nowMs,
+      dayStartUnix,
+      payload: output,
+    };
+    return output;
+  }
+
+  if (
+    cachedOpenAiDailyCost.payload &&
+    cachedOpenAiDailyCost.dayStartUnix === dayStartUnix &&
+    Date.now() - cachedOpenAiDailyCost.fetchedAt < OPENAI_DAILY_COST_CACHE_TTL_MS
+  ) {
+    return cachedOpenAiDailyCost.payload;
+  }
+
+  const url = buildOpenAiUrl("organization/costs");
+  url.searchParams.set("start_time", String(dayStartUnix));
+  url.searchParams.set("end_time", String(endTimeUnix));
+  url.searchParams.set("bucket_width", "1d");
+  url.searchParams.set("limit", "1");
+
+  const headers = {
+    Authorization: `Bearer ${OPENAI_USAGE_API_KEY}`,
+    Accept: "application/json",
+  };
+  if (OPENAI_ORG_ID) {
+    headers["OpenAI-Organization"] = OPENAI_ORG_ID;
+  }
+  if (OPENAI_PROJECT_ID) {
+    headers["OpenAI-Project"] = OPENAI_PROJECT_ID;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+  });
+
+  if (!response.ok) {
+    const body = await safeReadText(response);
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(
+        `OpenAI cost API unauthorized (${response.status}). Use an org admin key in OPENAI_USAGE_API_KEY.`
+      );
+    }
+    throw new Error(`OpenAI costs failed (${response.status}): ${body.slice(0, 220)}`);
+  }
+
+  const payload = await response.json();
+  const buckets = Array.isArray(payload?.data) ? payload.data : [];
+  const bucket = buckets[0] && typeof buckets[0] === "object" ? buckets[0] : {};
+  const results = Array.isArray(bucket?.results) ? bucket.results : [];
+
+  let amount = 0;
+  let currency = "USD";
+  for (const row of results) {
+    const value = asNumber(row?.amount?.value);
+    if (Number.isFinite(value)) amount += value;
+    const nextCurrency = String(row?.amount?.currency || "").trim().toUpperCase();
+    if (nextCurrency) currency = nextCurrency;
+  }
+
+  const output = {
+    startTime: dayStartUnix,
+    endTime: endTimeUnix,
+    amount: round4(amount),
+    currency,
+  };
+  cachedOpenAiDailyCost = {
+    fetchedAt: Date.now(),
+    dayStartUnix,
+    payload: output,
+  };
+  return output;
 }
 
 async function getCachedAssetUniverse() {

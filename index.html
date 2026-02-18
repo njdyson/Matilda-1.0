@@ -56,6 +56,10 @@
           <h2>Realized P/L</h2>
           <p id="realizedValue">$0.00</p>
         </article>
+        <article class="summary-card">
+          <h2>AI Spend (Today)</h2>
+          <p id="aiSpendValue">--</p>
+        </article>
       </section>
 
       <section class="content-grid">
@@ -115,6 +119,31 @@
             </label>
             <button id="autobotRunNowBtn" type="button" class="btn btn-ghost">Think Now</button>
           </div>
+          <details class="ai-settings-accordion autobot-settings-accordion">
+            <summary>Auto Trade Settings</summary>
+            <section class="settings-box autobot-settings-box" aria-label="Auto trade settings">
+              <label class="autobot-model-setting">
+                Model
+                <select id="aiAutobotModelSelect">
+                  <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+                  <option value="gpt-4o-mini">gpt-4o-mini</option>
+                  <option value="gpt-5-mini">gpt-5-mini</option>
+                  <option value="gpt-5-mini-2025-08-07">gpt-5-mini-2025-08-07</option>
+                  <option value="gpt-5.2-2025-12-11">gpt-5.2-2025-12-11</option>
+                  <option value="deepseek-chat">deepseek-chat</option>
+                  <option value="deepseek-reasoner">deepseek-reasoner</option>
+                </select>
+              </label>
+              <label>
+                Cadence (mins)
+                <input id="autobotIntervalMinsInput" type="number" min="5" max="240" step="1" value="30" />
+              </label>
+              <label>
+                Max Trades
+                <input id="autobotMaxTradesPerCycleInput" type="number" min="1" max="5" step="1" value="3" />
+              </label>
+            </section>
+          </details>
           <p id="backendRuntimeStatus" class="backend-runtime-status">Backend Runtime: connecting...</p>
           <label class="autobot-label">
             Thinking Feed (latest)
@@ -152,15 +181,18 @@
                 Provider
                 <select id="aiProviderSelect">
                   <option value="openai">OpenAI</option>
+                  <option value="deepseek">DeepSeek</option>
                 </select>
               </label>
               <label>
-                Model
+                Research Model
                 <select id="aiModelSelect">
                   <option value="gpt-4.1-mini">gpt-4.1-mini</option>
                   <option value="gpt-4o-mini">gpt-4o-mini</option>
                   <option value="gpt-5-mini">gpt-5-mini</option>
                   <option value="gpt-5-mini-2025-08-07">gpt-5-mini-2025-08-07</option>
+                  <option value="deepseek-chat">deepseek-chat</option>
+                  <option value="deepseek-reasoner">deepseek-reasoner</option>
                 </select>
               </label>
               <label class="checkbox-setting">
@@ -390,14 +422,6 @@
             </div>
           </div>
           <section class="settings-modal-form">
-            <label>
-              Auto Trade Cadence (mins)
-              <input id="autobotIntervalMinsInput" type="number" min="5" max="240" step="1" value="30" />
-            </label>
-            <label>
-              Max Trades Per Cycle
-              <input id="autobotMaxTradesPerCycleInput" type="number" min="1" max="5" step="1" value="3" />
-            </label>
             <label>
               Discovery Ticker Speed (mins)
               <input id="discoveryIntervalMinsInput" type="number" min="1" max="120" step="1" value="2" />

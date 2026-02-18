@@ -13,12 +13,12 @@ Matilda is a virtual trading wallet web app with play-money positions and live q
 - Live market quotes from Alpaca via secure backend route (`/api/quotes`)
 - Symbol search + add-to-watchlist flow backed by Alpaca assets (`/api/symbol-search`)
 - Clickable symbols with a basic candlestick chart (toggle `Mins` / `Days`)
-- AI research panel with OpenAI-powered sentiment/brief refresh button
+- AI research panel with OpenAI/DeepSeek sentiment+brief refresh
 - Horizon setting in header, model/provider settings in AI accordion
 - Finnhub company profile section separated above the AI brief
 - Local cache for AI research + company profile to reduce repeated API calls
 - Autobot panel with toggle, latest "thinking feed", and next recommendation
-- Manual "Apply to Ticket" plus auto cadence (minutes)
+- Auto Trade runs on cadence when enabled; "Think Now" triggers an immediate backend cycle
 - Scheduled Autobot trade execution runs on backend runtime (single executor) for foreground/background consistency
 - Backend Autobot runtime sync + heartbeat: server can continue cycles when the UI window is closed
 - Automatic simulation fallback if live API is unavailable
@@ -31,12 +31,16 @@ Matilda is a virtual trading wallet web app with play-money positions and live q
 - `ALPACA_KEY_ID`
 - `ALPACA_SECRET_KEY`
 - `FINNHUB_API_KEY` (for company profile metadata in AI panel)
-- `OPENAI_API_KEY` (for AI sentiment/research endpoint)
+- `OPENAI_API_KEY` (for OpenAI provider and web-search-backed research)
+- `DEEPSEEK_API_KEY` (for DeepSeek provider)
+- `OPENAI_USAGE_API_KEY` (optional org-admin key for OpenAI daily cost endpoint)
 - Optional: `ALPACA_FEED=iex` (default)
 - Optional: `ALPACA_TRADING_URL=https://api.alpaca.markets` (default; used for symbol search)
 - Optional: `FINNHUB_BASE_URL=https://finnhub.io/api/v1` (default)
 - Optional: `OPENAI_BASE_URL=https://api.openai.com/v1` (default)
 - Optional: `OPENAI_MODEL=gpt-4.1-mini` (default)
+- Optional: `DEEPSEEK_BASE_URL=https://api.deepseek.com/v1` (default)
+- Optional: `DEEPSEEK_MODEL=deepseek-chat` (default)
 
 ## Run locally
 
@@ -55,12 +59,13 @@ Then open `http://localhost:3000`.
 - `GET /api/company?symbol=AAPL` - Finnhub company profile metadata (name, industry, country, currency, IPO, market cap)
 - `GET /api/account/snapshot` - Alpaca paper account + positions snapshot (used for wallet sync)
 - `POST /api/trades` - Submit Alpaca paper market order (`symbol`, `side`, `qty`) and return updated snapshot
-- `POST /api/ai/research` - OpenAI-powered sentiment + confidence + action + brief for a symbol/settings payload
-- `POST /api/ai/autobot` - OpenAI-powered next-trade recommendation from whole-portfolio + snapshot context
+- `POST /api/ai/research` - provider-powered sentiment + confidence + action + brief (`openai` or `deepseek`)
+- `POST /api/ai/autobot` - provider-powered next-trade recommendation from whole-portfolio + snapshot context
+- `GET /api/openai/costs/daily` - OpenAI daily spend total for current UTC day
 - `GET /api/autobot/runtime/state` - current persisted backend runtime snapshot
 - `POST /api/autobot/runtime/sync` - sync frontend wallet/settings/AI cache heartbeat to backend runtime
 - `POST /api/autobot/runtime/run` - manually trigger one backend runtime cycle
-- `GET /api/health` now includes `openAiConfigured` for quick OpenAI key sanity check
+- `GET /api/health` now includes `openAiConfigured` and `deepseekConfigured` key sanity checks
 
 ## Notes
 
